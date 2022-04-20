@@ -264,3 +264,133 @@ Linux System Basic
  - exit 
    - Thoát ta sẽ nhập lệnh ``` $ exit ```
    - Lệnh đăng xuất ``` $ logout ```  
+
+## 3. Text-Fu
+ - stdout (Standard Out)
+   - Chuyển hướng nối đầu ra vào một tệp như ví dụ ``` $ echo Hello World > peanuts.txt ``` file text peanuts.txt sẽ có nội dung Hello World.
+   - Ở đây, > là toán tử chuyển hướng cho phép thay đổi đầu ra tiêu chuẩn. Thay vì đưa ra màn hình thì khi sử dụng > nó sẽ đưa đầu ra vào tệp.
+   - Nếu không muốn ghi đè thì ta sẽ sử dụng toán tử >> thay vì >.
+   
+ - stdin (Standard In)
+   - Tương tự stdout thì stdin sẽ dùng toán tử < để chuyển hướng.
+   - Ví dụ ``` $ cat < peanuts.txt > banana.txt ``` ở đây peanuts.txt được chuyển hướng thành stdin. Và đầu ra bên trong tệp peanuts.txt sẽ được chuyển hướng tới file mới là banana.txt.
+   
+ - stderr (Standard Error)
+   - Ví dụ liệt kê nội dung của thư mục không tồn tại và chuyển hướng kết quả đầu ra tới tệp peanuts.txt ``` $ ls /fake/directory > peanuts.txt ``` và kết quả hiển thị như sau ``` ls: cannot access /fake/directory: No such file or directory ```
+   - Lí do lỗi vậy là đã gặp lỗi tiêu chuẩn, vậy nên sẽ cần chuyển hướng đầu ra theo một cách khác.
+   - Cần sử dụng bộ mô tả tệp, bộ mô tả tệp là một số không âm được sử dụng để truy cập tệp hoặc luồng. Bộ mô tả tệ cho stdin, stdout, stderr lần lượt là 0,1,2.
+   - Để chuyển hướng ta sẽ sử dụng như sau: ``` $ ls /fake/directory 2> peanuts.txt ``` , Sẽ chỉ nhìn thấy các thông báo stderr trong peanuts.txt.
+   - Để xem cả nội stderr và stout trong peanuts.txt sẽ thực hiện ``` $ ls /fake/directory > peanuts.txt 2>&1 ```. Thao tác này sẽ gửi kết quả của ls/fake/ đến peanuts.txt sau đó chuyển hướng stderr đến stdout qua 2>&1.
+   - Chuyển hướng stdout và stderr đến một tệp ``` $ ls /fake/directory &> peanuts.txt ```
+   - Loại bỏ các tin thông báp stderr thì sẽ cần chuyển hướng đầu ra đếp tệp đặc biệt ``` $ ls / fake / directory 2> / dev / null ```
+   
+ - pipe and tee
+   - Hiển thị danh sách dài các mục ``` $ ls -la /etc ```
+   - Hiển thị các mục như danh sách sẽ ngắn gọn hơn ``` $ ls -la /etc | less ```
+   - Toán tử pipe biểu thị bằng | , cho phép lấy đoạn mã của một lệnh và chuyển đoạn lệnh đó sang một quá trình khác.
+   - Muốn viết đàu ra của lệnh vào 2 luồng khác nhau, thực hiện lệnh tee ``` $ ls | tee peanuts.txt ``` Kết quả đàu ra của ls trên màn hình và nếu mở tệp sẽ thấy thông tin tương tự trên màn hình.
+   
+ - env (Environment)
+   - ``` $ echo $HOME ``` sẽ thấy đường dẫn đến thư mục của mình.
+   - ``` $ echo $ USER ``` sẽ thấy tên người dùng.
+   - ``` $ env ``` xuất ra các thông tin về các biến môi trường mà đã được cài đặt. Các biến này chứa thông tin mà shell và các quy trình có thể sử dụng, ví dụ:
+     ```
+     PATH = / usr / local / sbin: / usr / local / bin: / usr / sbin: / bin
+     PWD = / home / user
+     USER = pete
+     ```
+   - Biến PATH có thể truy cập bằng cách $ ở trước tên biến 
+     ```
+     $ echo $ PATH
+     / usr / local / sbin: / usr / local / bin: / usr / sbin: / bin
+     ```
+   - Trả về một danh sách các đường dẫn được phân tách bằng dấu : mà hệ thống sẽ tìm kiếm khi nó chạy một lệnh.
+   
+ - cut
+   - ``` $ echo 'The quick brown; fox jumps over the lazy  dog' > sample.txt ```, thêm tab vào giữa lazy và dog
+   - Trích xuất các văn bản từ một tệp ta sử dụng lệnh cut
+   - Trích xuất nội dung theo danh sách các ký tự ``` $ cut -c 5 sample.txt ``` , xuất ra ký tự thứ 5 trong mỗi dòng của tệp.
+   - ``` $ cut -f 2 sample.txt ``` , -f cắt văn bản dựa trên các trường. Đầu ra sẽ là dog vì được phân tách các trường bởi tab.
+   - ``` $ cut -f 1 -d ";" sample.txt ``` Thay đổi dấu phân tách tab thành dấu ";" do đó kết quả là the quick brown do cắt trường đầu tiên.
+ 
+ - paste
+   - Tương tự như cat, nó sẽ kết hợp các dòng với nhau trong tệp
+     ```
+     sample2.txt
+     The
+     quick
+     brown
+     fox
+     ```
+   - Kết hợp các dòng trên thành một dòng ``` $ paste -s sample2.txt ```
+   - Dấu phân tách mặc định để dán là Tab, thay đổi dấu phân tách cho dễ đọc bằng -d ``` $ paste -d '' -s sample2.txt ``` , kết quả sẽ là mọi thứ nằm trên một dòng và được phân tách bằng dấu cách.
+   
+ - head 
+   - Hiển thị 10 dòng đầu tiên trong tệp thay vì tất cả ``` $ head /var/log/syslog ```
+   - Có thể sửa đổi số dòng bằng bất kì điều gì mong muốn, ví dụ sửa muốn xem 15 dòng đầu tiên ``` $ head -n 15 / var / log / syslog ``` , -n là viết tắt của số dòng.
+   
+ - tail
+   - Tương tự head thì tail sẽ cho phép xem 10 dòng cuối cùng của tệp theo mặc định ``` $ tail / var / log / syslog ```
+   - Có thể thay đổi số dòng muốn xem ``` $ tail -n 10 / var / log / syslog ```
+   - Sử dụng -f để theo dõi tệp khi nó phát triển. Cung cấp và xem nhữn gì xảy ra ``` $ tail -f / var / log / syslog ```
+   
+ - expand and unexpand
+   - Về mặc định sẽ luôn là Tab được sử dụng nhưng nếu muốn thay Tab thành dấu cách ta sử dụng lệnh expand ``` $ expand sample.txt ``` , sẽ in đầu ra với mỗi tab được chuyển đổi thành khoảng trống để lưu đầu ra trong 1 tệp ta sẽ sử dụng chuyển hướng đầu ra ``` $ expand sample.txt> result.txt ```
+   - Để chuyển đổi ngược lại từ dấu cách thành tab ta thực hiện lệnh unexpand ``` unexpand -a result.txt ```
+   
+ - join and split
+   - Cho phép kết nối nhiều tệp với nhau bằng một trường chung
+     ```
+     file1.txt
+     1 John
+     2 Jane
+     3 Mary
+
+     file2.txt
+     1 Doe
+     2 Doe
+     3 Sue
+
+     $ join file1.txt file2.txt
+     1 John Doe
+     2 Jane Doe
+     3 Mary Sue
+     ```
+   - Để kết nối khi không giống nhau ta sẽ sử dụng
+     ```
+     $ join -1 2 -2 1 file1.txt file2.txt
+     1 John Doe
+     2 Jane Doe
+     3 Mary Sue
+     ```
+   - Sử dụng lệnh tách để chia 1 tệp thành các tệp khác nhau ``` $ split somefile ```
+   
+ - sort
+   - $ sort file1.txt : sắp xếp theo chữ cái đầu dòng
+   - $ sort -r file1.txt : sắp xếp ngược lại
+   - $ sort -n file1.txt : sắp xếp theo giá trị số
+   
+ - tr (Translate)
+   - Cho phép dịch một bộ ký tự thành bộ ký tự khác, ví dụ dịch từ ký tự thường sang ký tự in hoa ``` $ tr az AZ ```
+ 
+ - uniq (Unique)
+   - Lệnh để phân tích cú pháp văn bản
+   - Ví dụ têp có nhiều bản sao sẽ dùng lệnh uniq để xoá bản sao ``` $ uniq reading.txt ```
+   - Tính xem số lần xuất hiện ``` $ uniq -c reading.txt ```
+   - Lấy các giá trị duy nhất ``` $ uniq -u reading.txt ```
+   - Lấy các giá trị trùng lặp ``` $ uniq -d reading.txt ```  
+   - uniq không phát hiện các dòng trùng trừ khi chúng ở gần nhau, do đó để khắc phục ta sẽ sử dụng sort kết hợp với uniq ``` $ sort reading.txt | uniq ```
+   
+ - wc and nl 
+   - wc sẽ hiển thị tổng số từ trong một tệp ``` $ wc /etc/passwd ``` , hiển thị số dòng, số từ và số byte tương ứng.
+   - Sử dụng -l, -w, -c để xem số lượng của mỗi trường nhất định.
+   - Có thể sử dụng nl để kiểm tra số dòng trên tệp ``` $ nl file1.txt ```
+   
+ - grep
+   - Cho phép bạn tìm kiếm các tệp cho các ký tự phù hợp với một mẫu nhất định ``` $ grep fox sample.txt ``` tìn fox trong sample.txt
+   - Phân biệt các mẫu chữ hoa chữ thường với -i ``` $ grep -i somepattern somefile ```
+   - Kết hợp với các lệnh khác bằng | ``` $ env | grep -i User ```
+   - ``` $ ls / somedir | grep '.txt $' ``` Trả về các tệp kết thúc bằng .txt xong somedir.  
+ 
+ 
+ 
