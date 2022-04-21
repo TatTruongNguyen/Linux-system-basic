@@ -392,5 +392,43 @@ Linux System Basic
    - Kết hợp với các lệnh khác bằng | ``` $ env | grep -i User ```
    - ``` $ ls / somedir | grep '.txt $' ``` Trả về các tệp kết thúc bằng .txt xong somedir.  
  
+## 4. Advanced Text-Fu
+ - regrex (Regular Expressions)
+   - Biểu thức chính quy sử dụng ký tự 
+     ```
+     sally sells seashells 
+     by the seashore
+     ```
+   - Bắt đầu bằng ^ ``` ^by ``` kết quả sẽ khớp là by the seashore.
+   - Kết thúc bằng $ ``` seashore$ ``` kết quả sẽ khớp là by the seashore.
+   - So khớp với bất kì ký tự đơn nào với . ``` b. ``` sẽ phù hợp với by.
+   - Có ký hiệu [] ``` d [iou] g ``` sẽ khớp với dig, dog, dug.
+   - Có ^ trước ký tự trong [] là tất cả những gì ngoài dấu ngoặc.
+   - Ngoài ra dấu [] cũng giúp tăng phạm vi số lượng ký tự muốn sử dụng ``` d [a-c] g ```
+   - Dấu ngoặc phân biệt chữ hoa và chữ thường.
+   
+ - Text Editors
+   - Vim và emacs là những trình soạn thảo văn bản phổ biến được cài đặt mặc định trên hầu hết các bản phân phối Linux và cả 2 đều có ưu và nhược điểm riêng.
+   - Chúng là mã hoá, xử lý tài liệu văn bản và về cơ bản là tất cả trong một trình soạn thảo.
+   
+ - Vim (Vi Improved)
+   - Là viết tắt của phiên bản cải tiến của lệnh soạn thảo văn bản vi.
+   - Siêu nhẹ, việc mở và chỉnh sủa tệp bằng vim nhanh chóng và dễ dàng, gần như luôn có sẵn.
+   - Để kích hoạt chỉ cần gõ ``` vim ```
+   
+ - Vim Search Patterns
+   - Khi cần tìm kiếm chỉ cần nhập / sau đó nhập kết quả tìm kiếm khi đang ở trong vim. Sau khi enter có thể ấn n để tiến và N để lùi 
+   - Có thể dùng ? để tìm kiếm ngược so với /
+   
+ - Vim Navigation
+   - Để điều hướng trong vim ta sử dụng các phím sau:
+     ```
+     h hoặc mũi tên trái để di chuyển sang trái
+     k hoặc mũi tên lên để di chuyển lên dòng trên
+     j hoặc mũi tên xuống để di chuyển xuống dòng dưới
+     l hoặc mũi tên phải để di chuyển sang phải
+     ```
+ - Vim Appending Text
+   -            
  
  
