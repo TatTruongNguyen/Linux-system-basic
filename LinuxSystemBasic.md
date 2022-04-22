@@ -545,7 +545,57 @@ Linux System Basic
     - Trường dành riêng để sử dụng trong tương lai
 
 - /etc/group  
+  - Một tệp khác được sử dụng trong quản lý người dùng là tệp / etc / group. Tệp này cho phép các nhóm khác nhau với các quyền khác nhau.
+    ``` $ cat /etc/group ```
+  - Bao gồm các trường: ``` root:*:0:pete ```
+    - Tên nhóm
+    - Mật khẩu nhóm
+    - ID nhóm
+    - Danh sách người dùng  
 
+- User Management Tools
+  - Hầu hết các môi trường doanh nghiệp đang sử dụng hệ thống quản lý để quản lý người dùng, tài khoản và mật khẩu. Tuy nhiên, trên một máy tính đơn lẻ có các lệnh hữu ích để chạy để quản lý người dùng.
+  - Thêm người dùng sử dụng lệnh adduser hoặc useradd ``` $ sudo useradd bob ```
+  - Xóa người dùng sử dụng lệnh userdel ``` $ sudo userdel bob ```
+  - Đổi password sử dụng ``` $ passwd bob ```
+
+## 6. Permissions
+ - File Permissions
+   - Ví dụ
+     ```
+     $ ls -l Desktop/
+     drwxr-xr-x 2 pete penguins 4096 Dec 1 11:45 .
+     ```
+   - Có 4 phần đối với phân quyền của tệp
+     - Đầu tiên là loại tệp
+     - 3 phần tiếp theo là các quyền, các quyền được nhóm thành 3 bit mỗi quyền, 3 bit đầu là quyền của người dùng, sau là quyền nhóm và cuối cùng là các quyền khác
+     - ``` d | rwx | r-x | r-x ```
+     - Mỗi kí tự đại diện cho mỗi quyền khác nhau: r: có thể đọc được, w: có thể ghi, x: thi hành, -: làm rỗng 
+ - Modifying Permissions
+   - Thay đổi quyền có thể dễ dàng thực hiện bằng lệnh ** chmod **
+   - Đầu tiên, hãy chọn nhóm quyền bạn muốn thay đổi, người dùng, nhóm hoặc nhóm khác. Bạn có thể thêm hoặc xóa quyền bằng dấu + hoặc - 
+   - Ví dụ : ``` $ chmod u+x myfile ``` Lệnh có nội dung như sau: thay đổi quyền trên myfile bằng cách thêm bit quyền thực thi trên tập người dùng. Vì vậy, bây giờ người dùng có quyền thực thi trên tệp này
+   - Xóa bit quyền trên một tệp ``` $ chmod u-x myfile ```
+   - Thêm nhiều bit quyền trên một tệp ``` $ chmod ug+w ``` .  Có một cách khác để thay đổi quyền sử dụng định dạng số. Phương pháp này cho phép bạn thay đổi các quyền cùng một lúc. Thay vì sử dụng r, w hoặc x để biểu thị các quyền, bạn sẽ sử dụng một biểu diễn số cho một tập hợp quyền duy nhất. Vì vậy, không cần chỉ định nhóm với g hoặc người dùng với u.
+     - Các biểu diễn số như sau: 4: quyền đọc, 2: quyền viết, 1 quyền thực thi.
+     - Ví dụ: ``` $ chmod 755 myfile ``` 
+ 
+ - Ownership Permissions
+   - Cũng có thể sửa đổi quyền sở hữu của nhóm và người dùng đối với tệp
+   - Sửa đổi quyền sở hữu của người dùng ``` $ sudo chown patty myfile ``` . Lệnh sẽ đặt chủ sở hữu của mylife thành patty,
+   - Sửa đổi quyền sở hữu nhóm ``` $ sudo chgrp whales myfile ``` . Lệnh sẽ đặt nhóm mylife thành whales.
+   - Sửa đổi quyền sở hữu người dùng và nhóm cùng một lúc. Nếu thêm : và tên nhóm sau người dùng thì có thể đặt cả người dùng và nhóm cùng một lúc ``` $ sudo chown patty:whales myfile ```
+ 
+ - Umask
+   - Muốn thay đổi bộ quyền mặc định, có thể làm như vậy bằng lệnh umask. Lệnh này sử dụng bộ quyền 3 bit mà chúng ta thấy trong các quyền số.
+   - Thay vì thêm các quyền này, umask sẽ lấy đi các quyền này ``` $ umask 021 ```
+   
+ - Setuid
+   -   
+
+  
+
+   
      
 
  
