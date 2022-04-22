@@ -429,6 +429,127 @@ Linux System Basic
      l hoặc mũi tên phải để di chuyển sang phải
      ```
  - Vim Appending Text
-   -            
+   - Khi đang ở chế độ lệnh sẽ không thể nhập được, để có thể nhập thì trước tiên ta sẽ cần vào chế độ chèn
+   - Gõ i : chèn văn bản trước con trỏ
+   - Gõ O : chèn văn bản trên dòng trước
+   - Gõ o : chèn văn bản vào dòng tiếp theo
+   - Gõ a : nối văn bản sau con trỏ
+   - Gõ A : nối văn bản vào cuối dòng
+   - Để thoát khoải chế độ chèn và quay lại chế độ lệnh, sử dụng phím Esc
+   
+ - Vim Editing
+   - Để có thể chỉnh sửa trong vim ta sẽ có những phím sau đây
+   - x : dùng để cắt văn bản đã chọn hay cũng được sử dụng để xóa các ký tự
+   - dd : dùng để xóa dòng hiện tại
+   - y : kéo hoặc sao chép bất cứ thứ gì được chọn
+   - yy : kéo hoặc sao chép dòng hiện tại
+   - p : dán văn bản đã sao chép trước con trỏ
+   
+ - Vim Saving and Exiting
+   - Để có thể lưu và thoát khỏi vim ta sẽ thực hiện như sau
+   - :w : dùng để ghi hoặc lưu tệp
+   - :q : dùng để thoát khỏi vim
+   - :wq : viết sau đó thoát khỏi vim
+   - :q! : thoát khỏi vim mà không lưu tệp
+   - ZZ : tương đương với :wq, nhưng nhanh hơn
+   - u : hoàn tác hành động cuối cùng của bạn
+   - Ctrl + r : thực hiện lại hành động cuối cùng
+   
+ - Emacs
+   - Dành cho những người dùng muốn có trình soạn thảo văn bản cực kỳ mạnh mẽ, có thể thực hiện tất cả việc chỉnh sửa mã, thao tác tệp...
+   - Để bắt đầu chỉ cần gõ ``` emacs ```
+   - Bộ đệm trong emacs là nơi chứa văn bản. Vì vậy, nếu mở một tệp, bộ đệm sẽ được sử dụng để lưu trữ nội dung của tệp đó. Có thể mở nhiều bộ đệm cùng lúc và có thể dễ dàng chuyển đổi giữa các bộ đệm.
+   
+ - Emacs Manipulate Files
+   - Để lưu tệp
+     - C-x C-s : Lưu tệp
+     - C-x C-w : Lưu tệp dưới dạng
+     - C-x s : Lưu tất cả
+   - Mở tệp
+     - C-x C-f         
+ 
+ - Emacs Buffer Navigation
+   - Để di chuyển xung quanh bộ đẹp, ta sử dụng các lệnh sau
+   - Chuyển đổi bộ đệm
+     - C-x b : chuyển đổi bộ đệm
+     - C-x right arrow : di chuyển sang phải bộ đệm
+     - C-x left arrow : di chuyển sang trái bộ đệm
+   - Đóng bộ đệm
+     - C-x k
+   - Tách bộ đệm hiện tại
+     - C-x 2 
+   - Đặt một bộ đệm duy nhất làm màn hình hiện tại           
+     - C-x 1
+ 
+ - Emacs Editing
+   - Điều hướng văn bản
+     ```
+     C-up arrow : di chuyển lên một đoạn
+     C-down arrow: di chuyển xuống một đoạn
+     C-left arrow: di chuyển một từ sang trái
+     C-right arrow: di chuyển một từ sang phải
+     M-> : di chuyển đến cuối vùng đệm
+     ```
+   - Cắt và dán
+     - Trước tiên cần phải chọn văn bản, di chuyển con trỏ đến nơi muốn cắt hoặc dán sau đó nhấn ``` C-space key ```
+     - Sau đó có thể cắt và dán bằng cách C-w : cắt, C-y : dán.
+ 
+ - Emacs Exiting and Help
+   - Để đóng Emacs ``` C-x C-c ```
+   - Cần trợ giúp ``` C-h C-h : help menu ```
+   - Hoàn tác ``` C-x u ```
+ 
+## 5. User Management 
+ - Users and Groups
+   - Trong bất kỳ hệ điều hành truyền thống nào, đều có người dùng và nhóm. Chúng chỉ tồn tại cho quyền truy cập và quyền.
+   - Mỗi người dùng có thư mục chính của riêng họ, nơi các tệp người dùng cụ thể của họ được lưu trữ, thư mục này thường nằm trong / home / username, nhưng có thể khác nhau trong các bản phân phối khác nhau.
+   - Hệ thống sử dụng mã người dùng (UID) để quản lý người dùng, tên người dùng là cách thân thiện để liên kết người dùng với nhận dạng, nhưng hệ thống xác định người dùng bằng UID của họ. Hệ thống cũng sử dụng nhóm để quản lý quyền, nhóm chỉ là tập hợp người dùng có quyền do nhóm đó thiết lập, họ được hệ thống xác định bằng ID nhóm (GID) của họ.
+   - Trong Linux, bạn sẽ có người dùng ngoài những người bình thường sử dụng hệ thống. Đôi khi những người dùng này là daemon hệ thống liên tục chạy các quy trình để giữ cho hệ thống hoạt động. Một trong những người dùng quan trọng nhất là root hoặc superuser, root là người dùng mạnh nhất trên hệ thống, root có thể truy cập bất kỳ tệp nào và bắt đầu và kết thúc bất kỳ quá trình nào.
+   - Để có thể chạy với quyền root sử dụng lệnh ``` sudo ```
+   
+ - root
+  - Có thể chạy các lệnh với tư cách là superuser bằng lệnh ``` su ```. Lệnh này sẽ "thay thế người dùng" và mở trình bao gốc nếu không có tên người dùng nào được chỉ định. Bạn có thể sử dụng lệnh này để thay thế cho bất kỳ người dùng nào miễn là bạn biết mật khẩu.
+  - Có một tệp được gọi là tệp / etc / sudoers, tệp này liệt kê những người dùng có thể chạy sudo. Có thể chỉnh sửa tệp này bằng lệnh ``` visudo ``` . 
+  
+- /etc/passwd
+  - Hệ thống sử dụng ID người dùng (UID) để xác định người dùng. Để biết người dùng được ánh xạ tới ID nào, hãy xem tệp / etc / passwd. ``` $ cat / etc / passwd ```
+  - Tệp này hiển thị danh sách người dùng và thông tin chi tiết về họ. Ví dụ: dòng đầu tiên trong tệp này rất có thể trông giống như sau:
+    ```
+    root:x:0:0:root:/root:/bin/bash
+    ```
+  - Mỗi dòng hiển thị thông tin người dùng cho một người dùng, thông thường nhất sẽ thấy người dùng root là dòng đầu tiên. Có nhiều trường được phân tách bằng dấu hai chấm cho biết thông tin bổ sung về người dùng.
+    - Tên tài khoản
+    - Mật khẩu người dùng
+    - ID người dùng, như trên root có UID là 0
+    - ID nhóm
+    - GECOS : được dùng để để lại nhận xét về người dùng hoặc tài khoản 
+    - Thư mục chỉnh sửa của người dùng
+    - Trình bao của người dùng
+  - có thể chỉnh sửa tệp / etc / passwd bằng tay nếu muốn thêm người dùng và sửa đổi thông tin bằng công cụ vipw.
+
+- /etc/shadow
+  - Tệp / etc / shadow được sử dụng để lưu trữ thông tin về xác thực người dùng. Nó yêu cầu quyền đọc siêu người dùng.
+    ```
+    $ sudo cat / etc / shadow
+    root: MyEPTEa $ 6Nonsense: 15000: 0: 99999: 7 :::
+    ```
+  - Nó trông rất giống với nội dung của / etc / passwd, tuy nhiên trong trường mật khẩu, sẽ thấy một mật khẩu được mã hóa. Các trường được phân tách bằng dấu hai chấm như sau:
+    - Tên tài khoản
+    - Mật khẩu được mã hóa
+    - Ngày thay đổi mật khẩu cuối cùng - được biểu thị bằng số ngày kể từ ngày 1/1/1970
+    - Độ tuổi mật khẩu tối thiểu
+    - Tuối mật khẩu tối đa
+    - Khoảng thời gian cảnh báo mật khẩu
+    - Khoảng thời gian không hoạt động của mật khẩu
+    - Ngày hết hạn tài khoản
+    - Trường dành riêng để sử dụng trong tương lai
+
+- /etc/group  
+
+     
+
+ 
+
+        
  
  
