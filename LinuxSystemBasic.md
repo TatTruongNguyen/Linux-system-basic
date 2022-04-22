@@ -591,7 +591,191 @@ Linux System Basic
    - Thay vì thêm các quyền này, umask sẽ lấy đi các quyền này ``` $ umask 021 ```
    
  - Setuid
-   -   
+   - Set User ID (SUID) cho phép người dùng chạy chương trình với tư cách là chủ sở hữu của tệp chương trình chứ không phải với tư cách là chính họ.
+   - Sửa đổi SUID, Có 2 cách sửa đổi các quyền SUID:
+     - Cách tượng trưng : ``` $ sudo chmod u+s myfile ```
+     - Cách số : ``` sudo chmod 4755 myfile ```
+   - SUID có ký hiệu là 4 và được cấp trước cho tập hợp quyền.  
+ 
+ - Setgid
+   - Tương tự như bit quyền ID người dùng đã đặt, có một bit quyền ID nhóm (SGID) đã đặt. Bit này cho phép một chương trình chạy như thể nó là một thành viên của nhóm đó.
+   - Sửa đổi SGID 
+     - Cách tượng trưng : ``` $ sudo chmod g+s myfile ```
+     - Cách số : ``` $ sudo chmod 2555 myfile ```
+   - SGID có số ký hiệu là 2.  
+   
+ - Process Permissions
+   - khởi chạy một quy trình, quy trình sẽ chạy với các quyền tương tự như người dùng hoặc nhóm đã chạy nó, đây được gọi là effective user ID. UID này được sử dụng để cấp quyền truy cập cho một quy trình.    
+   - Có một UID khác, được gọi là real user ID , đây là ID của người dùng đã khởi chạy quy trình. Chúng được sử dụng để theo dõi người dùng đã khởi chạy quy trình là ai.
+   - Một UID cuối cùng là saved user ID, điều này cho phép quá trình chuyển đổi giữa UID hiệu quả và UID thực, ngược lại.
+   
+ - The Sticky Bit
+   - Bit quyền này, "sticks a file/directory", điều này có nghĩa là chỉ chủ sở hữu hoặc người dùng root mới có thể xóa hoặc sửa đổi tệp. Điều này rất hữu ích cho các thư mục được chia sẻ.
+   - ví dụ :
+      ```
+      $ ls -ld /tmp
+      drwxrwxrwxt 6 root root 4096 Dec 15 11:45 /tmp
+      ```
+      Một bit quyền đặc biệt t ở cuối, nghĩa là mọi người đều có thể thêm tệp, ghi tệp, sửa đổi tệp trong thư mục tmp nhưng chỉ root mới có thể xóa thư mục,
+   - Sửa đổi bit dính
+     - Dạng tượng trưng : ``` $ sudo chmod +t mydir ```
+     - Dạng số : ``` $ sudo chmod 1755 mydir ```
+   - Số ký tự của bit dính là 1.
+ 
+## 7. Processes 
+ - ps (Processes)
+   - Quy trình là các chương trình đang chạy trên máy của bạn. Chúng được quản lý bởi hạt nhân và mỗi tiến trình có một ID được liên kết với nó được gọi là process ID (PID). PID này được chỉ định theo thứ tự các quá trình được tạo. 
+   - Chạy lệnh ps
+     ```
+     $ ps
+     PID TTY STAT TIME CMD
+     41230 pts / 4 S 00:00:00 bash
+     51224 pts / 4 R + 00:00:00 ps
+     ```
+     PID : ID quy trình
+     TTY : kiểm soát thiết bị đầu cuối liên quan đến quy trình
+     STAT: Mã trạng thái quy trình
+     TIME: Tổng thời gian sử dụng CPU
+     CMD : Tên của lệnh (Lệnh thực thi)
+   - Lệnh ``` $ ps aux ``` , a : các quá trình đang chạy, u : hiển thị chi tiết hơn các quy trình, x : liệt kê các quy trình không có TTY liên kết với nó, các quy trình này sẽ hiển thị ? trong trường TTY.
+   - Lệnh ``` $ top ``` , cung cấp thông tin thời gian thực về các tiến trình đang chạy trên hệ thống, theo mặc định thì sẽ được làm mới sau mỗi 10s.
+   
+ - Controlling Terminal
+   - TTY là thiết bị đầu cuối thực hiện lệnh.
+   - Có 2 loại thiết bị đầu cuối
+     - terminal devices: là thiết bị đầu cuối nguyên bản có thể nhập và gửi đàu ra tới hệ thống.
+     - pseudoterminal devices: mô phỏng các thiết bị đầu cuối với cửa sổ đầu cuối shell và được ký hiệu là PTS.
+   - Các quy trình thường bị ràng buộc với một thiết bị đầu cuối điều khiển. 
+   - Trong đầu ra ps, TTY được liệt kê là ? nghĩa là nó không có thiết bị đầu cuối điều khiển.
+   
+ - Process Details 
+   - Kernel phụ trách các quá trình, khi chạy một chương trình, hạt nhân sẽ tải mã của chương trình đó vào bộ nhớ, xác định và phân bổ tài nguyên rồi giữ các tab trên mỗi quá trình, nó biết:
+     - Tình trạng của quá trình
+     - Các tài nguyên mà quá trình đang sử dụng và nhận được
+     - Chủ sở hữu quy trình
+     - Xử lí tín hiệu
+     - Mọi thứ khác
+   - Công việc của kernel là đảm bảo rằng các quy trình nhận được lượng tài nguyên phù hợp tùy thuộc vào nhu cầu của quy trình. Khi một quá trình kết thúc, các tài nguyên mà nó đã sử dụng sẽ được giải phóng cho các quá trình khác.
+   
+ - Process Creation
+   - Khi một quy trình mới được tạo, một quy trình hiện tại về cơ bản sẽ tự sao chép bằng cách sử dụng một thứ gọi là lệnh gọi hệ thống rẽ nhánh.
+   - Lệnh gọi hệ thống rẽ nhánh tạo ra một quy trình con gần như giống hệt nhau, quy trình con này nhận một ID quy trình mới (PID) và quy trình gốc trở thành quy trình mẹ của nó và có một cái gì đó được gọi là ID quy trình mẹ PPID.
+   - Tiến trình con có thể tiếp tục sử dụng cùng một chương trình mà cha mẹ của nó đã sử dụng trước đó hoặc thường xuyên hơn sử dụng lệnh gọi hệ thống thực thi để khởi chạy một chương trình mới.     
+   - Lệnh gọi hệ thống này phá hủy việc quản lý bộ nhớ mà hạt nhân đưa vào cho quá trình đó và thiết lập các bộ nhớ mới cho chương trình mới.
+     ```
+     $ ps l
+     ```
+   - Tùy chọn l cung cấp chế độ xem định dạng dài, chi tiết hơn về các quy trình đang chạy. Cột có nhãn PPID là ID mẹ.
+   - Khi hệ thống khởi động, các hạt nhân tạo ra một tiến trình gọi là init , nó có PID là 1. Tiến trình init không thể kết thúc trừ khi hệ thống tắt. Nó chạy với đặc quyền root và chạy nhiều quy trình giúp hệ thống luôn hoạt động.
+   
+ - Process Termination
+   - Một quy trình có thể thoát bằng lệnh gọi hệ thống exit , điều này sẽ giải phóng tài nguyên mà quy trình đang sử dụng để phân bổ lại. Vì vậy, khi một tiến trình sẵn sàng kết thúc, nó sẽ cho hạt nhân biết lý do tại sao nó kết thúc với một thứ gọi là trạng thái kết thúc. Thông thường nhất, trạng thái 0 có nghĩa là quá trình đã thành công. Tuy nhiên, điều đó không đủ để chấm dứt hoàn toàn một quá trình. Tiến trình mẹ phải xác nhận việc kết thúc quy trình con bằng cách sử dụng lệnh gọi của hệ thống chờ và điều này làm là nó kiểm tra trạng thái kết thúc của quy trình con. 
+   - Orphan Processes: Khi tiến trình cha chết trước tiến trình con, kernel biết sẽ không nhận được lệnh chờ nó sẽ biến các tiến trình này thành orphan và đặt chúng cho init chăm sóc. Init sẽ thực hiện lệnh gọi của hệ thống chờ những tiến trình orphan này có thế chết.
+   - Zombie Processes: Mặc dù tiến trình con kết thúc nhưng hạt nhân sẽ biến các tiến trình con này thành một quá trình zombie, các tài nguyên tiến trình con sử dụng vẫn được giải phóng cho tiến trình khác. Zombie processes không thể bị giết vì có thể hiểu chúng đã chết về mặt kỹ thuật. Cuối cùng nếu tiến trình cha gọi lệnh chờ hệ thống, thây ma sẽ biến mất, điều này được gọi là "gặt hái". Nếu cha mẹ không thực hiện cuộc gọi chờ, init sẽ chấp nhận zombie và tự động thực hiện chờ và loại bỏ zombie.
+   
+ - Signals
+   - Tín hiệu là một thông báo cho một quá trình rằng điều gì đó đã xảy ra.
+   - Lí do có tín hiệu
+     - Người dùng có thể nhập một trong các ký tự đầu cuối đặc biệt hoặc để hủy, ngắt hoặc tạm dừng các tiến trình
+     - Sự cố phần cứng có thể xảy ra và hạt nhân muốn thông báo quá trình
+     - Sự cố về phần mềm có thể xảy ra và hạt nhân muốn thông báo quá trình
+     - Là những cách mà quy trình có thể giao tiếp
+   - Quy trình tín hiệu
+     - Tín hiệu được tạo ra bởi một số sự kiện sau đó được chuyển đến một quá trình, được gọi là trạng thái chờ xử lí cho đến khi được phân phối. Khi quá trình được chạy, tính hiệu sẽ được phân phối. Tuy nhiên, các quy trình có mặt nạ tín hiệu và chúng có thể đặt việc phân phối tín hiệu bị chặn nếu được chỉ định. Khi một tín hiệu được phân phối, một quá trình có thể thực hiện vô số việc:
+       - Bỏ qua tín hiệu
+       - Bắt tín hiệu và thực hiện 1 quy trình xử lý cụ thể
+       - Quá trình có thể được kết thúc, trái ngược với lệnh gọi hệ thống thoát bình thường.
+       - Chặn tín hiệu, tùy thuộc vào mặt nạ tín hiệu
+   - Tín hiệu chung
+     - Mỗi tín hiệu được xác định bởi các số nguyên có tên tượng trưng có dạng SIGxxx
+     - Một số tín hiệu phổ biến
+       - SIGHUP hoặc HUP hoặc 1: Cúp máy
+       - SIGINT hoặc INT hoặc 2: Ngắt
+       - SIGKILL hoặc KILL hoặc 9: Giết
+       - SIGSEGV hoặc SEGV hoặc 11: Lỗi phân đoạn
+       - SIGTERM hoặc TERM hoặc 15: Chấm dứt phần mềm
+       - SIGSTOP hoặc STOP: Dừng lại 
+     - Một số tín hiệu không thể chặn được, một ví dụ là tín hiệu SIGKILL. Tín hiệu KILL phá hủy quá trình. 
+ 
+ - kill (Terminate)
+   - Có thể gửi các tín hiệu kết thúc quá trình, một lệnh như vậy được đặt tên hợp lý là lệnh kill. ``` $ kill 12445 ``` ,1 2445 là PID của quá trình bạn muốn kết thúc.
+   - Có thể chỉ định một tính hiệu bằng lệnh kill ``` $ kill -9 12445 ```
+   - Sự khác nhau giữa SIGHUP, SIGINT, SIGTERM, SIGKILL, SIGSTOP
+     - SIGHUP - Cúp máy, được gửi tới một quy trình khi thiết bị đầu cuối điều khiển đóng.
+     - SIGINT - Là một tín hiệu ngắt, vì vậy bạn có thể sử dụng Ctrl-C và hệ thống sẽ cố gắng kết thúc quá trình một cách nhẹ nhàng.
+     - SIGTERM - Hủy quá trình, nhưng cho phép nó thực hiện một số hoạt động dọn dẹp trước.
+     - SIGKILL - Giết quá trình, giết nó bằng lửa, không thực hiện bất kỳ hoạt động dọn dẹp nào.
+     - SIGSTOP - Dừng / tạm ngừng quá trình.
+ 
+ - niceness
+   - Các quy trình sử dụng CPU trong một khoảng thời gian nhỏ được gọi là lát thời gian. Sau đó, chúng tạm dừng trong mili giây và một quá trình khác nhận được một lát thời gian nhỏ. Theo mặc định, lập lịch quy trình diễn ra theo kiểu tuần hoàn này. Mọi quy trình đều có đủ thời gian cho đến khi xử lý xong. Kernel xử lý tất cả các quá trình chuyển đổi này và nó thực hiện khá tốt công việc đó trong hầu hết thời gian.
+   - Niceness là các tiến trình có một số để xác định mức độ ưu tiên của chúng đối với CPU. Một số cao có nghĩa là quá trình tốt và có mức độ ưu tiên thấp hơn cho CPU và số thấp hoặc âm có nghĩa là quá trình không tốt lắm và nó muốn lấy càng nhiều CPU càng tốt.
+   - Để thay đổi mức độ ta sử dụng lệnh nice hoặc renice
+     - ``` $ nice -n 5 apt upgrade ```
+     - ``` $ renice 10 -p 3245 ```
+     - Lệnh nice được sử dụng để đặt mức độ ưu tiên cho một tiến trình mới. Lệnh renice được sử dụng để đặt mức độ ưu tiên trên một quy trình hiện có.
+ 
+ - Process States
+   - Xem lệnh ``` $ ps aux ```
+   - Trong cột STAT sẽ thấy rất nhiều giá trị, các mã trạng thái phổ biến nhất là:
+     - R: đang chạy hoặc có thể chạy được, nó chỉ chờ CPU xử lý thôi
+     - S: Chế độ ngủ gián đoạn, chờ một sự kiện hoàn thành, chẳng hạn như đầu vào từ thiết bị đầu cuối
+     - D: Ngủ liên tục, các quá trình không thể bị giết hoặc bị gián đoạn bằng tín hiệu, thường để làm cho chúng biến mất, bạn phải khởi động lại hoặc khắc phục sự cố
+     - Z: Zombie, chúng ta đã thảo luận trong một bài học trước rằng zombie là những tiến trình đã kết thúc đang chờ thu thập trạng thái của chúng
+     - T: Đã dừng, một quá trình đã bị tạm dừng / dừng
+ 
+ - /proc filesystem
+   - Thông tin quy trình được lưu trữ trong một hệ thống tệp đặc biệt được gọi là hệ thống tệp / proc. ``` $ ls /proc ```
+   - ``` $ cat /proc/12345/status ``` thông tin trạng thái quy trình và thông tin chi tiết hơn. Thư mục / proc là cách kernel xem hệ thống, vì vậy có rất nhiều thông tin ở đây hơn những gì bạn sẽ thấy trong ps.
+   
+ - Job Control
+   - Gửi một công việc đến nền bằng cách thêm dấu & vào lệnh sẽ chạy ở chế độ nền để vẫn có thể sử dụng cửa sổ lệnh:
+     ```
+     $ sleep 1000 &
+     $ sleep 1001 &
+     $ sleep 1002 &
+     ```
+   - Xem các công việc nền
+     ```
+     $ jobs
+     [1]    Running     sleep 1000 &
+     [2]-   Running     sleep 1001 &
+     [3]+   Running     sleep 1002 &
+     ```
+     Thao tác này sẽ hiển thị id công việc trong cột đầu tiên, sau đó là trạng thái và lệnh đã được chạy. Dấu + bên cạnh ID công việc có nghĩa là nó là công việc nền gần đây nhất đã bắt đầu. Công việc với - là lệnh gần đây nhất thứ hai.
+   - Gửi một công việc đến nền trên công việc hiện có, nếu đã chạy một công việc và muốn gửi nó xuống nền, bạn không cần phải chấm dứt nó và bắt đầu lại. Trước tiên, hãy tạm dừng công việc bằng Ctrl-Z, sau đó chạy lệnh ** bg ** để gửi nó xuống nền.
+   - Di chuyển công việc từ nền sang nền trước ``` $ fg %1 ```
+   - Giết công việc nền ``` kill %1 ```
+## 8. Packages   
+ - Software Distribution
+ - Package Repositories
+ - tar and gzip
+ - Package Dependencies
+ - rpm and dpkg
+ - yum and apt
+ - Compile Source Code
+ 
+
+
+
+
+
+
+    
+   
+  
+
+
+     
+
+
+
+                 
+ 
+
+  
+
+
 
   
 
