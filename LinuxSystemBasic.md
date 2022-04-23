@@ -743,7 +743,7 @@ Linux System Basic
      [3]+   Running     sleep 1002 &
      ```
      Thao tác này sẽ hiển thị id công việc trong cột đầu tiên, sau đó là trạng thái và lệnh đã được chạy. Dấu + bên cạnh ID công việc có nghĩa là nó là công việc nền gần đây nhất đã bắt đầu. Công việc với - là lệnh gần đây nhất thứ hai.
-   - Gửi một công việc đến nền trên công việc hiện có, nếu đã chạy một công việc và muốn gửi nó xuống nền, bạn không cần phải chấm dứt nó và bắt đầu lại. Trước tiên, hãy tạm dừng công việc bằng Ctrl-Z, sau đó chạy lệnh ** bg ** để gửi nó xuống nền.
+   - Gửi một công việc đến nền trên công việc hiện có, nếu đã chạy một công việc và muốn gửi nó xuống nền, bạn không cần phải chấm dứt nó và bắt đầu lại. Trước tiên, hãy tạm dừng công việc bằng Ctrl-Z, sau đó chạy lệnh ``` bg ``` để gửi nó xuống nền.
    - Di chuyển công việc từ nền sang nền trước ``` $ fg %1 ```
    - Giết công việc nền ``` kill %1 ```
 ## 8. Packages   
