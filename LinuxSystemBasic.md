@@ -748,12 +748,122 @@ Linux System Basic
    - Giết công việc nền ``` kill %1 ```
 ## 8. Packages   
  - Software Distribution
+   - Hệ thống bao gồm nhiều gói như trình duyệt, trình soạn thảo, trình phát đa phương tiện,.. Các gói này sẽ được quản lý thông qua trình quản lý gói để cài đặt và duy trì phần mềm trên hệ thống.
+   - Thường có thể cài đặt trực tiếp từ mã nguồn, nhưng phần lớn là sử dụng trình quản lý gói để cài đặt, các gói phổ biến là Debian (.deb), Red Hat (.rpm).
+   - Những người viết các phần mềm được gọi là upstream providers, họ biên dịch mã và viết cách cài đặt, họ làm việc để đưa ra các phiên bản, phần mềm mới. Khi đã sẵn sàng phát hành, họ gửi gói tới package maintainers, những người này sẽ xử lý và đưa phần mềm tới người dùng, xem xét và quản lý phàn mềm này dưới dạng gói.
+    
  - Package Repositories
+   - Kho lưu trữ chỉ là một vị trí lưu trữ trung tâm cho các gói. Có rất nhiều kho chứa rất nhiều gói và tốt nhất là tất cả chúng đều được tìm thấy trên internet, không có đĩa cài đặt.
+   - Thay vì truy cập trang web để tải xuống, chúng ta có thể yêu cầu máy tính tìm phần mềm từ liên kết nguồn.
+   - Bản phân phối đã đi kèm với các nguồn được phê duyệt trước để lấy các gói và đây là cách nó cài đặt tất cả các gói cơ sở mà chúng ta thấy trên hệ thống của mình. Trên hệ thống Debian, tệp nguồn này là tệp /etc/apt/sources.list .
+  
  - tar and gzip
+   - gzip là chương trình được sử dụng để nén các tệp trong linux, chúng kết thúc bằng phần mở rộng ``` .gz ```
+     - Nén tệp: ``` $ gzip mycoolfile ```
+     - Giải nén: ``` $ gunzip mycoolfile.gz ```
+   - gzip sẽ không thể thêm nhiều tệp vào 1 kho lưu trữ, thay vì đó chúng ta sẽ sử dụng tar. Kho lưu trữ tar sẽ có phần mở rộng .tar
+     - Tạo tệp lưu trữ bằng tar ``` $ tar cvf mytarfile.tar mycoolfile1 mycoolfile2 ```
+       - c: tạo
+       - v: yêu cầu chương trình cho xem chúng đang làm gì
+       - f: tên tệp của tệp tar phải đứng sau tùy chọn này 
+     - Giải nén kho lưu trữ bằng tar ``` $ tar xvf mytarfile.tar ```
+       - x: trích xuất
+       - v: yêu cầu chương trình cho xem chúng đang làm gì
+       - f: tệp muốn giải nén
+     - Nén và giải nén các kho lưu trữ bằng tar và gzip
+       - Tạo tệp tar nén: ``` $ tar czf myfile.tar.gz ```
+       - Giải nén: ``` $ tar xzf file.tar ```
+ 
  - Package Dependencies
+   - Các gói rất hiếm khi tự hoạt động, chúng thường đi kèm với các gói phụ thuộc để giúp chúng chạy.
+   - Trong Linux, các phần phụ thuộc này thường là các gói khác hoặc các thư viện được chia sẻ. Thư viện dùng chung là thư viện mã mà các chương trình khác muốn sử dụng và không muốn phải viết lại cho chính mình.
+   - Các gói có các phần phụ thuộc để giúp chúng chạy, cho dù các phần phụ thuộc đó là các gói hay thư viện khác, nếu các phần phụ thuộc không có ở đó thì gói sẽ bị hỏng trạng thái và hầu hết thời gian thậm chí không cài đặt. 
+  
  - rpm and dpkg
+   - Để cài đặt các gói trực tiếp này, có thể sử dụng các lệnh quản lý gói: rpm và dpkg. 
+   - Sẽ không cài đặt các gói phụ thuộc, do vậy nếu gói có phụ thuộc thì sẽ cần cài đặt các gói riêng lẻ và sau đó là các phần phụ thuộc.
+   - Cài đặt gói:
+     - Debian: $ dpkg -i some_deb_package.deb
+     - RPM: $ rpm -i some_rpm_package.rpm
+       - i là viết tắt của install (cài đặt)   
+   - Xóa gói:
+     - Debian: $ dpkg -i some_deb_package.deb
+     - RPM: $ rpm -e some_rpm_package.rpm
+       - Debian: r để xóa
+       - RPM: e để xóa
+   - Liệt kê các gói đã cài đặt:
+     - Debian: $ dpkg -l
+     - RPM: $ rpm -qa
+       - Debian: l là cho danh sách
+       - RPM: q cho truy vấn và a là cho tất cả  
+      
  - yum and apt
+   - Các hệ thống đi kèm với tất cả các bản sửa lỗi để làm cho việc cài đặt, gỡ bỏ và thay đổi gói dễ dàng hơn, bao gồm cả việc cài đặt các gói phụ thuộc. Hai trong số các hệ thống quản lý phổ biến nhất là yum và apt . Yum dành riêng cho dòng Red Hat và apt dành riêng cho dòng Debian.
+   - Cài đặt một gói từ kho lưu trữ:
+     - Debian: $ apt install package_name
+     - RPM: $ yum install package_name
+   - Loại bỏ một gói:
+     - Debian: $ apt remove package_name
+     - RPM: $ yum erase package_name 
+   - Cập nhật các gói cho một kho lưu trữ:
+     - Debian: apt update; apt upgrade
+     - RPM: yum update
+   - Nhận thông tin về một gói đã cài đặt:
+     - Debian: apt show package_name
+     - RPM: yum info package_name      
+ 
  - Compile Source Code
+   - Thông thường, sẽ gặp phải một gói khó hiểu chỉ xuất hiện dưới dạng mã nguồn thuần túy. Chúng ta sẽ cần sử dụng một số lệnh để gói mã nguồn đó được biên dịch và cài đặt trên hệ thống.
+   - Đầu tiên sẽ cần có phần mềm để cài đặt các công cụ cho phép biên dịch mã nguồn: 
+     ``` $ sudo apt install build-essential ```
+   - Sau đó giải nén nội dung của tệp gói
+     ``` $ tar -xzvf package.tar.gz ```
+   - Trước khi làm gì đó hãy xem tệp README để xem hướng dẫn cài đặt cụ thể.
+   - Bên trong nội dung gói sẽ là tập lệnh cấu hình, tập lệnh này kiểm tra các phần phụ thuộc vào hệ thống và nếu thiếu bất kỳ điều gì chúng ta sẽ thấy lỗi và cần phải sửa chúng. ``` $ ./configure ```, ``` ./ ``` cho phép thực thi tập lệnh trong thư mục hiện tại.
+   - ``` $ make ```, bên trong nội dung gói sẽ có tệp Makefile chứa các quy tắc để xây dựng phần mềm, và khi chạy lệnh make thì nó sẽ xem tệp này để xây dựng phần mềm.
+   - Lệnh để cài đặt gói, nó sẽ sao chép các tệp chính xác vào đúng vị trí trên máy tính. ``` $ sudo make install ```
+   - Để gỡ cài đặt sử dụng lệnh ``` $ sudo make uninstall ```
+   - Để có thể dễ dàng trong việc gỡ cài đặt và cài đặt hãy sử dụng lệnh ``` $ sudo checkinstall ```. Lệnh này sẽ thực hiện và xây dựng gói .deb và cài đặt nó để giúp dễ dàng cho việc gỡ các gói sau này.
+ 
+## 9. Devices 
+ - /dev directory
+   - Khi kết nối một thiết bị với máy của mình, nó thường cần một trình điều khiển thiết bị để hoạt động bình thường. Bạn có thể tương tác với trình điều khiển thiết bị thông qua tệp thiết bị hoặc nút thiết bị, đây là những tệp đặc biệt trông giống như tệp thông thường.
+   - Các tệp thiết bị này thường được lưu trữ trong thư mục /dev. Hãy tiếp tục và chọn thư mục / dev trên hệ thống, sẽ thấy một lượng lớn các tệp thiết bị có trong hệ thống. 
+     ``` $ ls /dev ```
+   - Khi gửi đầu ra đến /dev/null, kernel biết rằng thiết bị này lấy tất cả dữ liệu đầu vào và chỉ loại bỏ nó nên sẽ không có gì được trả lại.
+ 
+ - device types
+   - Có lệnh sau:
+     ```
+     $ ls -l /dev
+     brw-rw----   1 root disk      8,   0 Dec 20 20:13 sda
+     crw-rw-rw-   1 root root      1,   3 Dec 20 20:13 null
+     srw-rw-rw-   1 root root           0 Dec 20 20:13 log
+     prw-r--r--   1 root root           0 Dec 20 20:13 fdata
+     ``` 
+   - Từ trái sang phải tương ứng các cột như sau: quyền, người sở hữu, nhóm, số thiết bị chính, số thiết bị phụ, dấu thời gian, tên thiết bị.
+   - Trong lệnh ls có thể thấy loại tệp với bit đầu tiên trên mỗi dòng, các tệp thiết bị được biễn thị:
+     - c: ký tự
+     - b: khối
+     - p: pipe
+     - s: socket 
+   - Thiết bị ký tự
+     - Các thiết bị này truyền dữ liệu và mỗi lần một ký tự, sẽ thấy rất nhiều thiết bị giả dưới dạng thiết bị ký tự, những thiết bị này không thực sự được kết nối vật lý với máy, nhưng chúng cho phép hệ điều hành có nhiều chức năng hơn.
+   - Chặn thiết bị
+     - Các thiết bị này truyền dữ liệu, nhưng trong các khối có kích thước cố định lớn. Sẽ thường thấy các thiết bị sử dụng khối dữ liệu làm thiết bị khối, chẳng hạn như ổ cứng, hệ thống tệp, v.v.
+   - Thiết bị đường ống (pipe)
+     - Các đường ống được đặt tên cho phép hai hoặc nhiều quy trình giao tiếp với nhau, chúng tương tự như các thiết bị ký tự, nhưng thay vì có đầu ra được gửi đến một thiết bị, nó được gửi đến một quy trình khác.
+   - Thiết bị ổ cắm (socket)
+     - Thiết bị ổ cắm tạo điều kiện giao tiếp giữa các quy trình, tương tự như thiết bị đường ống nhưng chúng có thể giao tiếp với nhiều quy trình cùng một lúc.
+   - Đặc tính thiết bị
+     - Các thiết bị được đặc trưng bằng cách sử dụng hai số, số thiết bị chính và số thiết bị phụ.
+     - Trong ví dụ ls ở trên, chúng được phân tách bằng dấu phẩy. Ví dụ: giả sử một thiết bị có số thiết bị: 8, 0.
+ 
+ - Device Names 
+
+           
+
+
  
 
 
