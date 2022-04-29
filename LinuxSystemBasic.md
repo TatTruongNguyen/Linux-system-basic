@@ -859,7 +859,122 @@ Linux System Basic
      - Các thiết bị được đặc trưng bằng cách sử dụng hai số, số thiết bị chính và số thiết bị phụ.
      - Trong ví dụ ls ở trên, chúng được phân tách bằng dấu phẩy. Ví dụ: giả sử một thiết bị có số thiết bị: 8, 0.
  
- - Device Names 
+ - Device Names
+   - Thiết bị SCSI: SCSI là viết tắt của Small Computer System Interface, nó là một giao thức được sử dụng để cho phép giao tiếp giữa đĩa, máy in, máy quét và các thiết bị ngoại vi khác với hệ thống. Hệ thống Linux tương ứng với đĩa SCSI với ổ đĩa cứng trong /dev. Chúng được thể hiện bằng tiền tố sd (đĩa SCSI): 
+     - /dev/sda - Đĩa cứng đầu tiên
+     - /dev/sdb - Đĩa cứng thứ hai
+     - /dev/sda3 - Phân vùng thứ ba trên đĩa cứng đầu tiên
+   - Thiết bị giả: thiết bị giả không thực sự được kết nối vật lý với hệ thống, hầu hết các thiết bị giả phổ biến là thiết bị ký tự:
+     - /dev/zero - chấp nhận và loại bỏ tất cả đầu vào, tạo ra một luồng byte giá trị null liên tục
+     - /dev/null - chấp nhận và loại bỏ tất cả đầu vào, không tạo ra đầu ra
+     - /dev/random - tạo ra các số ngẫu nhiên
+   - Thiết bị PATA: ổ cứng được tham chiếu với tiền tố hd
+     - /dev/hda - đĩa cứng đầu tiên
+     - /dev/hdd2 - phân vùng thứ hai trên đĩa cứng thứ 4
+ 
+ - sysfs
+   - Sysfs đã được tạo ra từ lâu để quản lý tốt hơn các thiết bị trên hệ thống mà thư mục /dev không làm được.
+   - Sysfs là một hệ thống tập tin ảo, thường được gắn vào thư mục /sys.
+   - Nó cung cấp cho nhiều thông tin chi tiết hơn những gì có thể thấy trong thư mục /dev. 
+   - Cả hai thư mục /sys và /dev dường như rất giống nhau và chúng giống nhau về mặt nào đó, nhưng chúng có những điểm khác biệt lớn. Về cơ bản, thư mục /dev rất đơn giản, nó cho phép các chương trình khác tự truy cập vào thiết bị, trong khi hệ thống tập tin /sys được sử dụng để xem thông tin và quản lý thiết bị.
+   - Hệ thống tệp /sys về cơ bản chứa tất cả thông tin cho tất cả các thiết bị trên hệ thống, chẳng hạn như nhà sản xuất và kiểu máy, nơi thiết bị được cắm vào, trạng thái của thiết bị, phân cấp thiết bị và hơn thế nữa. Các tệp bạn thấy ở đây không phải là các nút thiết bị, vì vậy không thực sự tương tác với các thiết bị từ thư mục /sys, thay vì đang quản lý thiết bị.
+ 
+ - udev
+   - ``` $ mknod /dev/sdb1 b 8 3 ``` lệnh tạo một nút thiết bị /dev/sdb1 và sẽ làm cho nó trở thành thiết bị khối b với số chính là 8 và số phụ là 3.
+   - Để xóa thiết bị chỉ cần rm tệp thiết bị trong thư mục /dev.
+   - Hệ thống udev sẽ tự động tạo và xóa tệp thiết bị tùy thuộc vào việc chúng có được kết nối hay không. 
+   - Có udevd đang chạy trên hệ thống và lắng nghe các thông báo từ kernel về các thiết bị được kết nối với hệ thống, udevd sẽ phân tích cú pháp thông tin đó và sẽ khớp dữ liệu với các quy tắc được chỉ định trong /etc/udev/rules.d.
+   - Có thể xem cơ sở dữ liệu udev và sysfs bằng lệnh udevadm.
+   
+ - lsusb, lspci, lssci
+   - Đây là các công cụ để liệt kê thông tin về thiết bị
+   - Liệt kê các thiết bị usb: ``` lsusb ```
+   - Liệt kê các thiết bị PCI: ``` lspci ```
+   - Liệt kê các thiết bị SCSI: ``` lsscsi ```
+   
+ - dd
+   - Công cụ dd rất hữu ích để chuyển đổi và sao chép dữ liệu. Nó đọc đầu vào từ một tệp hoặc luồng dữ liệu và ghi nó vào một tệp hoặc luồng dữ liệu.
+   ``` $ dd if=/home/pete/backup.img of=/dev/sdb bs=1024 ```
+   Lệnh đang sao chép nội dung của backup.img sang /dev/sdb, sao chép dữ liệu theo khối 1024 byte cho đến khi không còn dữ liệu nào được sao chép.
+     - if = file : tệp đầu vào đọc từ tệp thay vì đầu vào chuẩn
+     - of = file : tệp đầu ra, ghi vào tệp thay vì đầu ra tiêu chuẩn
+     - bs = byte : kích thước khối, đọc và ghi nhiều byte dữ liệu này cùng lúc.
+     - count = number : số khối cần sao chép 
+   - Một số lệnh dd sử dụng tùy chọn đếm, thường với dd nếu muốn sao chép tệp có dung lượng 1 megabyte.
+   - dd cực kỳ mạnh mẽ, có thể sử dụng nó để sao lưu mọi thứ, bao gồm toàn bộ ổ đĩa, khôi phục hình ảnh đĩa và hơn thế nữa. 
+ 
+## 10. The Filesystem
+ - Filesystem Hierarchy
+   - Thực hiện lệnh ls -l / để xem các thư mục được liệt kê trong thư mục gốc:
+     - / - Thư mục gốc của toàn bộ hệ thống tập tin phân cấp, mọi thứ đều nằm trong thư mục này.
+     - /bin - Các chương trình sẵn sàng chạy cần thiết (mã nhị phân), bao gồm các lệnh cơ bản nhất như ls và cp.
+     - /boot - Chứa các tệp bộ tải khởi động hạt nhân.
+     - /dev - Tệp thiết bị.
+     - /etc - Thư mục cấu hình hệ thống cốt lõi, chỉ nên chứa các tệp cấu hình chứ không phải bất kỳ tệp nhị phân nào.
+     - /home - Thư mục cá nhân cho người dùng, lưu giữ tài liệu, tệp, cài đặt của bạn, v.v.
+     - /lib - Chứa các tệp thư viện mà các tệp nhị phân có thể sử dụng.
+     - /media - Được sử dụng làm điểm đính kèm cho phương tiện di động như ổ USB.
+     - /mnt - Hệ thống tệp được gắn kết tạm thời.
+     - /opt - Các gói phần mềm ứng dụng tùy chọn.
+     - /proc - Thông tin về các quy trình hiện đang chạy.
+     - /root - Thư mục chính của người dùng root.
+     - /run - Thông tin về hệ thống đang chạy kể từ lần khởi động cuối cùng.
+     - /sbin - Chứa các tệp nhị phân hệ thống thiết yếu, thường chỉ có thể chạy bằng root.
+     - /srv - Dữ liệu dành riêng cho trang web được hệ thống cung cấp.
+     - /tmp - Bộ nhớ cho các tệp tạm thời
+     - /usr - Thật không may, nó được đặt tên, hầu hết nó không chứa các tệp người dùng theo nghĩa là một thư mục chính. Điều này có nghĩa là dành cho phần mềm và tiện ích do người dùng cài đặt, tuy nhiên điều đó không có nghĩa là bạn không thể thêm thư mục cá nhân vào đó. Bên trong thư mục này là các thư mục con cho /usr/bin, /usr/local, v.v.
+     - /var - Thư mục biến, nó được sử dụng để ghi nhật ký hệ thống, theo dõi người dùng, bộ nhớ đệm, v.v. Về cơ bản, bất kỳ thứ gì có thể thay đổi liên tục. 
+     
+ - Filesystem Types
+   - Viết nhật ký:
+     - Việc ghi nhật ký được mặc định trên hầu hết các loại hệ thống tệp, nhưng đề phòng trường hợp không có, chúng ta nên biết chức năng của nó. Giả sử chúng ta đang sao chép một tệp lớn và đột nhiên bạn bị mất điện. 
+     - Nếu chúng ta đang sử dụng hệ thống tệp không được ghi nhật ký, tệp sẽ bị hỏng và hệ thống tệp của bạn sẽ không nhất quán và sau đó khi khởi động lại, hệ thống của sẽ thực hiện kiểm tra hệ thống tệp để đảm bảo mọi thứ đều ổn. Tuy nhiên, việc sửa chữa có thể mất một lúc tùy thuộc vào dung lượng hệ thống tệp.
+     - Bây giờ nếu đang ở trên một hệ thống ghi nhật ký, trước khi máy bắt đầu sao chép tệp, nó sẽ ghi những gì chúng ta sẽ làm vào một tệp nhật ký (nhật ký). 
+     - Bây giờ khi chúng ta thực sự sao chép tệp, sau khi nó hoàn thành, nhật ký sẽ đánh dấu nhiệm vụ đó là hoàn thành. 
+     - Hệ thống tập tin luôn ở trạng thái nhất quán vì điều này, vì vậy nó sẽ biết chính xác nơi đã dừng lại nếu máy tắt đột ngột. Điều này cũng làm giảm thời gian khởi động vì thay vì kiểm tra toàn bộ hệ thống tệp, nó chỉ xem nhật ký.
+   - Các loại hệ thống tập tin máy tính để bàn phổ biến:
+     - ext4 - Đây là phiên bản mới nhất của hệ thống tệp Linux gốc. Nó tương thích với các phiên bản ext2 và ext3 cũ hơn. Nó hỗ trợ khối lượng đĩa lên đến 1 exabyte và kích thước tệp lên đến 16 terabyte và hơn thế nữa. Nó là sự lựa chọn tiêu chuẩn cho các hệ thống tập tin Linux.
+     - Btrfs - "Better or Butter FS" là một hệ thống tệp mới dành cho Linux đi kèm với các ảnh chụp nhanh, sao lưu gia tăng, tăng hiệu suất và hơn thế nữa. Nó được cung cấp rộng rãi, nhưng chưa hoàn toàn ổn định và tương thích.
+     - XFS - Hệ thống tệp nhật ký hiệu suất cao, tuyệt vời cho hệ thống có các tệp lớn như máy chủ đa phương tiện.
+     - NTFS và FAT - Hệ thống tệp Windows
+     - HFS + - Hệ thống tệp Macintosh
+   - Lệnh df báo cáo việc sử dụng không gian đĩa hệ thống tệp và các chi tiết khác về đĩa.
+ 
+ - Anatomy of a Disk
+   - Đĩa cứng có thể được chia nhỏ thành các phân vùng, về cơ bản tạo ra nhiều thiết bị khối.
+   - Phân vùng cực kỳ hữu ích để phân tách dữ liệu và nếu bạn cần một hệ thống tệp nhất định.
+   - Bảng phân vùng: 
+     - Mỗi đĩa sẽ có một bảng phân vùng, bảng này cho hệ thống biết cách phân vùng của đĩa. 
+     - Bảng này cho biết nơi bắt đầu và kết thúc của các phân vùng, những phân vùng nào có thể khởi động được, những thành phần nào của đĩa được cấp cho phân vùng nào, v.v. Có hai lược đồ bảng phân vùng chính được sử dụng, Master Boot Record (MBR) và GUID Partition Table (GPT)
+   - Vách ngăn:
+     - Đĩa bao gồm các phân vùng giúp chúng ta tổ chức dữ liệu của mình. 
+     - Có thể có nhiều phân vùng trên một đĩa và chúng không thể chồng lên nhau.
+     - Nếu có không gian không được phân bổ cho một phân vùng, thì nó được gọi là không gian trống.
+     - MBR:
+       - Bảng phân vùng truyền thống, được sử dụng làm tiêu chuẩn
+       - Có thể có phân vùng chính, mở rộng và phân vùng logic
+       - MBR có giới hạn là bốn phân vùng chính
+       - Có thể tạo phân vùng bổ sung bằng cách tạo phân vùng chính thành phân vùng mở rộng (chỉ có thể có một phân vùng mở rộng trên đĩa). Sau đó, bên trong phân vùng mở rộng, thêm các phân vùng hợp lý. Các phân vùng hợp lý được sử dụng giống như bất kỳ phân vùng nào khác.
+       - Hỗ trợ đĩa lên đến 2 terabyte
+     - GPT:
+       - Bảng phân vùng GUID (GPT) đang trở thành tiêu chuẩn mới để phân vùng đĩa
+       - Chỉ có một loại phân vùng và bạn có thể tạo nhiều phân vùng trong số đó
+       - Mỗi phân vùng có một ID duy nhất trên toàn cầu (GUID)
+       - Được sử dụng chủ yếu cùng với khởi động dựa trên UEFI
+   - Cấu trúc hệ thống tập tin
+     - Khối khởi động - Khối này nằm trong một vài sector đầu tiên của hệ thống tệp và nó không thực sự được hệ thống tệp sử dụng. Đúng hơn, nó chứa thông tin được sử dụng để khởi động hệ điều hành. Hệ điều hành chỉ cần một khối khởi động. Nếu bạn có nhiều phân vùng, chúng sẽ có các khối khởi động, nhưng nhiều trong số chúng không được sử dụng.
+     - Siêu khối - Đây là một khối đơn lẻ nằm sau khối khởi động và nó chứa thông tin về hệ thống tệp, chẳng hạn như kích thước của bảng inode, kích thước của các khối logic và kích thước của hệ thống tệp.
+     - Bảng Inode - Hãy coi đây là cơ sở dữ liệu quản lý các tệp của chúng ta (chúng ta có cả một bài học về inode, vì vậy đừng lo lắng). Mỗi tệp hoặc thư mục có một mục nhập duy nhất trong bảng inode và nó có nhiều thông tin khác nhau về tệp.
+     - Khối dữ liệu - Đây là dữ liệu thực tế cho các tệp và thư mục. 
+ 
+ - Disk Partitioning                   
+    
+  
+
+
+
+     
+   
 
            
 
