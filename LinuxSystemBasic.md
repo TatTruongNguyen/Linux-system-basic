@@ -1384,16 +1384,43 @@ Linux System Basic
    
 ## 15. Logging
  - System Logging
+   - Các dịch vụ, hạt nhân, daemon, v.v. trên hệ thống đang liên tục làm điều gì đó, dữ liệu này thực sự được gửi để lưu trên hệ thống dưới dạng nhật ký.
+   - Dữ liệu này thường được giữ trong thư mục /var.
+   - Syslog thực sự chứa nhiều thành phần, một trong những thành phần quan trọng là một daemon đang chạy có tên là syslogd, đợi thông báo sự kiện xảy ra và lọc những thành phần mà nó muốn biết, và tùy thuộc vào những gì nó phải làm với tin nhắn đó, nó sẽ gửi nó đến một tệp, bảng điều khiển của bạn hoặc không làm gì với nó.
+   - Ví dụ về dòng từ nhật kí hệ thống:
+     ```
+     less /var/log/syslog
+     Jan 27 07:41:32 icebox anacron[4650]: Job `cron.weekly' started
+     ```
+   - Có thể thấy rằng vào ngày 27 tháng 1 07:41:32 dịch vụ cron của chúng tôi đã chạy công việc cron.weekly.    
  
  - syslog
+   - Dịch vụ nhật ký hệ thống quản lý và gửi nhật ký đến bộ ghi nhật ký hệ thống. 
+   - Rsyslog là một phiên bản nâng cao của nhật ký hệ thống, hầu hết các bản phân phối Linux sẽ sử dụng phiên bản mới này. 
+   - Đầu ra của tất cả nhật ký mà dịch vụ nhật ký hệ thống thu thập có thể được tìm thấy tại /var/log/syslog
+   - Để tìm hiểu những tệp nào được trình ghi nhật ký hệ thống duy trì, hãy xem các tệp cấu hình trong /etc/rsyslog.d
+   - Các quy tắc này đối với tệp nhật ký được biểu thị bằng bộ chọn ở cột bên trái và hành động trên cột bên phải. 
+   - Lệnh ghi nhật kí ``` logger -s Hello ```   
  
  - General Logging
+   - Có hai tệp nhật ký chung mà có thể xem để biết hệ thống đang làm gì:
+     - /var/log/messages: Nhật ký này chứa tất cả các thông báo không quan trọng và không gỡ lỗi, bao gồm các thông báo được ghi trong quá trình khởi động (dmesg), auth, cron, daemon, v.v. Rất hữu ích để xem máy đang hoạt động như thế nào.
+     - /var/log/syslog: Điều này ghi lại mọi thứ ngoại trừ tin nhắn xác thực, nó cực kỳ hữu ích để gỡ lỗi.     
  
  - Kernel Logging
+   - /var/log/dmesg:
+     - Hiển thị thông tin về trình điều khiển phần cứng, thông tin hạt nhân và trạng thái trong quá trình khởi động và hơn thế nữa. Tệp nhật ký này có thể được tìm thấy tại /var/log/dmesg và được đặt lại sau mỗi lần khởi động, có thể không thực sự thấy bất kỳ công dụng nào trong đó bây giờ, nhưng nếu ừng gặp sự cố với một thứ gì đó trong quá trình khởi động hoặc sự cố phần cứng, thì dmesg là nơi tốt nhất để xem xét. Có thể xem nhật kí này bằng lệnh ``` dmesg ``` .
+   - /var/log/kern.log:
+     - Một bản ghi khác mà có thể sử dụng để xem thông tin kernel là tệp /var/log/kern.log, tệp này ghi lại thông tin kernel và các sự kiện trên hệ thống, nó cũng ghi đầu ra dmesg.
  
  - Authentication Logging
+   - /var/log/auth.log: Điều này chứa nhật ký ủy quyền hệ thống, chẳng hạn như đăng nhập của người dùng và phương pháp xác thực được sử dụng.
+   - Đoạn mã mẫu ``` Jan 31 10:37:50 icebox pkexec: pam_unix(polkit-1:session): session opened for user root by (uid=1000) ```
  
  - Managing Log Files
+   - Các tệp nhật ký tạo ra nhiều dữ liệu và chúng lưu trữ dữ liệu này trên đĩa cứng.
+   - Tiện ích logrotate thực hiện quản lý nhật ký. Nó có một tệp cấu hình cho phép chỉ định số lượng và những nhật ký nào cần giữ lại, cách nén nhật ký để tiết kiệm dung lượng và hơn thế nữa. Công cụ logrotate thường hết cron mỗi ngày một lần có thể tìm thấy các tệp cấu hình trong /etc/logrotate.d.
+   - Có những công cụ logrotating khác có thể sử dụng để quản lý nhật ký, nhưng logrotate là công cụ phổ biến nhất.
    
 
 
