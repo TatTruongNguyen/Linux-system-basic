@@ -967,7 +967,45 @@ Linux System Basic
      - Bảng Inode - Hãy coi đây là cơ sở dữ liệu quản lý các tệp của chúng ta (chúng ta có cả một bài học về inode, vì vậy đừng lo lắng). Mỗi tệp hoặc thư mục có một mục nhập duy nhất trong bảng inode và nó có nhiều thông tin khác nhau về tệp.
      - Khối dữ liệu - Đây là dữ liệu thực tế cho các tệp và thư mục. 
  
- - Disk Partitioning                   
+ - Disk Partitioning
+   - Có nhiều công cụ có sẵn để thực hiện việc phân vùng ổ đĩa:
+     - fdisk - công cụ phân vùng dòng lệnh cơ bản, nó không hỗ trợ GPT
+     - parted - đây là một công cụ dòng lệnh hỗ trợ cả phân vùng MBR và GPT
+     - gparted - đây là phiên bản GUI của parted
+     - gdisk - fdisk, nhưng nó không hỗ trợ MBR chỉ GPT
+   - Sử dụng parted để thực hiện phân vùng 
+     - Khởi chạy: ``` sudo parted ```
+     - Chọn thiết bị: ``` select /dev/sdb2 ```
+     - Xem bảng phân vùng: 
+       ```
+       (parted) print                                                            
+         Model: Seagate (scsi)
+         Disk /dev/sda: 21.5GB
+         Sector size (logical/physical): 512B/512B
+         Partition Table: msdos
+         Number  Start   End     Size    Type      File system     Flags
+         1      1049kB  6860MB  6859MB  primary   ext4            boot
+         2      6861MB  21.5GB  14.6GB  extended
+         5      6861MB  7380MB  519MB   logical   linux-swap(v1)
+         6      7381MB  21.5GB  14.1GB  logical   xfs
+        ```
+      - Phân vùng thiết bị: ``` mkpart primary 123 4567 ```
+      - Thay đổi kích thước phân vùng: ``` resize 2 1245 3456 ```
+  
+  - Creating Filesystems
+    - Tạo hệ thống tập tin bằng lệnh ``` sudo mkfs -t ext4 /dev/sdb2 ```
+    - mkfs cho phép chỉ định loại hệ thống têp chúng ta muốn và nơi chúng ta muốn nó.
+    
+  - mount and umount
+    - Trước khi có thể xem nội dung của hệ thống tệp thì sẽ phải gắn kết nó. Để làm điều đó sẽ cần vị trí thiết bị, loại hệ thống tệp và điểm gắn kết.
+    - Điểm gắn kết là một thư mục trên hệ thống nơi hệ thống tệp sẽ được đính kèm.
+    - Tạo điểm gắn kết ``` sudo mount -t ext4 /dev/sdb2 /mydrive ```, -t là chỉ định loại hệ thống tệp tiếp theo là vị trí thiết bị và cuối cùng là điểm gắn kết.
+    - Để ngắt kết nối thiết bị và điểm gắn kết ``` sudo umount /mydrive ``` hoặc ``` sudo umount /dev/sdb2 ```
+    - Để xem UUIDS trên hệ thống cho các thiết bị khối ``` sudo blkid ```
+    - Như vậy đã thấy UUID để gắn kêt có thể sử dụng ``` sudo mount UUID=130b882f-7d79-436d-a096-1e594c92bb76 /mydrive ```
+    
+  - /etc/fstab    
+  
     
   
 
