@@ -1004,8 +1004,287 @@ Linux System Basic
     - Để xem UUIDS trên hệ thống cho các thiết bị khối ``` sudo blkid ```
     - Như vậy đã thấy UUID để gắn kêt có thể sử dụng ``` sudo mount UUID=130b882f-7d79-436d-a096-1e594c92bb76 /mydrive ```
     
-  - /etc/fstab    
+  - /etc/fstab
+    - Khi chúng ta muốn tự động gắn kết các hệ thống tập tin khi khởi động, chúng ta có thể thêm chúng vào một tập tin có tên /etc/fstab viết tắt của bảng hệ thống tập tin. Tệp này chứa danh sách cố định các hệ thống tệp được gắn kết.
+      ``` cat /etc/fstab
+      UUID=130b882f-7d79-436d-a096-1e594c92bb76 /               ext4    relatime,errors=remount-ro 0       1       
+      ```
+    - Mỗi dòng đại diện cho một hệ thống tệp, có các trường:
+      - UUID - Mã định danh thiết bị
+      - Điểm gắn kết - Thư mục hệ thống tệp được gắn vào
+      - Loại hệ thống tập tin
+      - Tùy chọn - các tùy chọn gắn kết khác, xem trang chủ để biết thêm chi tiết
+      - Dump - được sử dụng bởi tiện ích kết xuất để quyết định thời điểm thực hiện sao lưu, bạn chỉ nên đặt mặc định là 0
+      - Pass - Được fsck sử dụng để quyết định thứ tự hệ thống tệp nào nên được kiểm tra, nếu giá trị là 0, nó sẽ không được kiểm tra
   
+  - swap
+    - Hoán đổi tốt là những gì sử dụng để cấp phát bộ nhớ ảo cho hệ thống. Nếu sắp hết bộ nhớ, hệ thống sử dụng phân vùng này để "hoán đổi" các phần bộ nhớ của các tiến trình không hoạt động vào đĩa.
+    - Sử dụng phân vùng để hoán đổi không gian:
+    - Ví dụ muốn thiết lập phân vùng /dev/sdb2 để được sử dụng cho không gian hoán đổi
+      - Trước tiên, hãy đảm bảo rằng không có bất kỳ thứ gì trên phân vùng
+      - Chạy: mkswap / dev / sdb2 để khởi tạo các khu vực hoán đổi
+      - Chạy: swapon / dev / sdb2, điều này sẽ cho phép thiết bị hoán đổi
+      - Nếu muốn phân vùng hoán đổi vẫn tiếp tục khởi động, cần thêm mục nhập vào tệp / etc / fstab. sw là loại hệ thống tệp mà bạn sẽ sử dụng.
+      - Để xóa swap: swapoff / dev / sdb2
+  
+  - Disk Usage
+    - Lệnh df cho thấy việc sử dụng các hệ thống tệp hiện đang được gắn kết, -h cùng cấp một định dạng mà con người có thể đọc được, có thể xem thiết bị là gì, dung lượng sử dụng và khả dụng là bao nhiêu.
+    - Ví dụ dung lượng sắp đầy và cần biết thư mục hay tệp nào đang chiếm dung lượng thì hãy sử dụng lệnh ``` du ```
+    
+  - Filesystem Repair
+    - Lệnh fsck (kiểm tra hệ thống tệp) được sử dụng để kiểm tra tính nhất quán của hệ thống tệp và thậm chí có thể cố gắng sửa chữa. Thông thường khi khởi động đĩa, fsck sẽ chạy trước khi đĩa được gắn để đảm bảo mọi thứ đều ổn. Tuy nhiên, đôi khi, đĩa quá tệ nên cần phải thực hiện việc này theo cách thủ công. Tuy nhiên, hãy đảm bảo thực hiện việc này khi bạn đang ở trong đĩa cứu hộ hoặc nơi nào đó mà có thể truy cập hệ thống tệp của mình mà không cần gắn kết.
+    - ```sudo fsck /dev/sda ``` 
+    
+  - Inodes
+    - Inode là gì: Một inode (nút chỉ mục) là một mục nhập trong bảng này và có một mục cho mọi tệp. Nó mô tả mọi thứ về tệp, chẳng hạn như:
+      - Loại tệp - tệp thông thường, thư mục, thiết bị ký tự, v.v.
+      - Người sở hữu
+      - Tập đoàn
+      - Quyền truy cập
+      - Dấu thời gian - mtime (thời gian sửa đổi tệp cuối cùng), ctime (thời gian thay đổi thuộc tính cuối cùng), atime (thời gian của lần truy cập cuối cùng)
+      - Số lượng liên kết cứng đến tệp
+      - Kích thước của tệp
+      - Số khối được phân bổ cho tệp
+      - Con trỏ đến các khối dữ liệu của tệp
+    - Inodes được tạo khi nào: Khi một hệ thống tệp được tạo, không gian cho các inodes cũng được phân bổ. Có những thuật toán diễn ra để xác định dung lượng inode cần tùy thuộc vào dung lượng của đĩa và hơn thế nữa. Có thể đã từng gặp lỗi vì sự cố hết dung lượng đĩa. Điều tương tự cũng có thể xảy ra đối với các inodes (mặc dù ít phổ biến hơn), có thể hết inodes và do đó không thể tạo thêm tệp. Hãy nhớ việc lưu trữ dữ liệu phụ thuộc vào cả dữ liệu và cơ sở dữ liệu (inodes).
+    - Thông tin inode: Inode được xác định bằng số, khi một tệp được tạo, nó sẽ được gán một số inode, số được gán theo thứ tự tuần tự. Tuy nhiên, đôi khi có thể nhận thấy khi tạo một tệp mới, nó nhận được số inode thấp hơn những người khác, điều này là do khi các inode bị xóa, chúng có thể được sử dụng lại bởi các tệp khác. Để xem số inode, chạy ``` ls -li ``` 
+    - Cách để inodes định vị tệp: Inodes trỏ đến các khối dữ liệu thực tế của tệp. Trong một hệ thống tệp điển hình (không phải tất cả đều hoạt động giống nhau), mỗi inode chứa 15 con trỏ, 12 con trỏ đầu tiên trỏ trực tiếp đến các khối dữ liệu. Con trỏ thứ 13, trỏ tới một khối chứa con trỏ đến nhiều khối hơn, con trỏ thứ 14 trỏ đến một khối con trỏ lồng nhau khác và con trỏ thứ 15 lại trỏ tới một khối con trỏ khác.
+    
+  - symlinks
+    - Các liên kết tượng trưng cho phép liên kết đến một tệp khác bằng tên tệp của nó. Một loại liên kết khác được tìm thấy trong Linux là liên kết cứng, đây thực sự là một tệp khác có liên kết đến inode.
+    - Các liên kết tượng trưng được ký hiệu là ->.
+    - Số inode là duy nhất cho hệ thống tệp, bạn không thể có hai số inode giống nhau trong một hệ thống tệp, có nghĩa là không thể tham chiếu một tệp trong một hệ thống tệp khác bằng số inode của nó. Tuy nhiên, nếu sử dụng các liên kết tượng trưng, chúng không sử dụng số inode mà sử dụng tên tệp, vì vậy chúng có thể được tham chiếu trên các hệ thống tệp khác nhau.  
+    - Liên kết cứng: Một liên kết cứng chỉ tạo một tệp khác có liên kết đến cùng một inode.
+    - Tạo liên kết biểu tượng: ``` ln -s myfile mylink ``` , Để tạo một liên kết tượng trưng, sử dụng lệnh ln với -s cho biểu tượng và bạn xác định một tệp đích và sau đó là tên liên kết. 
+    - Tạo một liên kết cứng: ``` ln somefile somelink ``` 
+    
+## 11. Boot the System  
+ - Boot Process Overview
+   - Chia làm 4 giai đoạn:
+     - BIOS: BIOS (là viết tắt của "Hệ thống đầu vào / đầu ra cơ bản") khởi tạo phần cứng và đảm bảo với tự kiểm tra khi bật nguồn (POST) rằng tất cả phần cứng đều hoạt động tốt. Công việc chính của BIOS là tải bộ nạp khởi động.
+     - Bộ nạp khởi động: Bộ nạp khởi động tải nhân vào bộ nhớ và sau đó khởi động nhân với một tập hợp các tham số của nhân. Một trong những bộ nạp khởi động phổ biến nhất là GRUB, đây là một tiêu chuẩn phổ biến của Linux.
+     - Nhân (Kernel): Khi kernel được tải, nó ngay lập tức khởi tạo các thiết bị và bộ nhớ. Công việc chính của kernel là tải tiến trình init.
+     - Init: Quá trình init là quá trình đầu tiên được bắt đầu, init bắt đầu và dừng quá trình dịch vụ thiết yếu trên hệ thống. Có ba cách triển khai chính của init trong các bản phân phối Linux.
+ 
+ - Boot Process: BIOS
+   - BIOS
+     - Bước đầu tiên trong quá trình khởi động Linux là BIOS thực hiện kiểm tra tính toàn vẹn của hệ thống. BIOS là phần sụn phổ biến nhất trong các máy tính tương thích với IBM PC, loại máy tính chiếm ưu thế hiện nay. Có thể đã sử dụng phần sụn BIOS để thay đổi thứ tự khởi động của đĩa cứng, kiểm tra thời gian hệ thống, địa chỉ mac của máy, v.v. Mục tiêu chính của BIOS là tìm bộ nạp khởi động hệ thống.
+     - khi BIOS khởi động ổ cứng, nó sẽ tìm kiếm khối khởi động để tìm ra cách khởi động hệ thống. Tùy thuộc vào cách phân vùng đĩa của mình, nó sẽ giống như bản ghi khởi động chính (MBR) hoặc GPT. MBR nằm trong sector đầu tiên của ổ cứng, 512 byte đầu tiên. MBR chứa mã để tải một chương trình khác ở đâu đó trên đĩa, chương trình này thực sự tải lên bộ nạp khởi động. 
+   - UEFI
+     - Là một cách khác để khởi động hệ thống thay vì sử dụng BIOS.
+     - UEFI được thiết kế để kế thừa BIOS, hầu hết phần cứng hiện có ngày nay đều được tích hợp sẵn firmware UEFI. Các máy Macintosh đã sử dụng khả năng khởi động EFI trong nhiều năm nay và Windows hầu như đã chuyển tất cả nội dung của chúng sang khởi động UEFI. Định dạng GPT được thiết kế để sử dụng với EFI. Không nhất thiết phải cần EFI nếu đang khởi động đĩa GPT. Khu vực đầu tiên của đĩa GPT được dành riêng cho một "MBR bảo vệ" để có thể khởi động máy dựa trên BIOS.
+     - UEFI lưu trữ tất cả thông tin về khởi động trong tệp .efi. Tệp này được lưu trữ trên một phân vùng đặc biệt được gọi là phân vùng hệ thống EFI trên phần cứng. Bên trong phân vùng này, nó sẽ chứa bộ nạp khởi động. UEFI đi kèm với nhiều cải tiến từ phần sụn BIOS truyền thống. Tuy nhiên, vì chúng ta đang sử dụng Linux nên phần lớn chúng ta đang sử dụng BIOS.
+   
+ - Boot Process: Bootloader
+   - Các trách nhiệm chính của bootloader:
+     - Khởi động vào một hệ điều hành, nó cũng có thể được sử dụng để khởi động vào các hệ điều hành không phải Linux
+     - Chọn một nhân để sử dụng
+     - Chỉ định các tham số hạt nhân
+   - Bộ nạp khởi động phổ biến nhất cho Linux là GRUB. 
+   - Có nhiều bộ nạp khởi động khác mà có thể sử dụng như LILO, efilinux, coreboot, SYSLINUX và hơn thế nữa.
+   - Các tham số có thể được tìm thấy bằng cách vào menu GRUB khi khởi động bằng phím 'e'. Nếu không có GRUB, xem xét các thông số khởi động sẽ thấy:
+     - initrd - Chỉ định vị trí của đĩa RAM ban đầu (chúng ta sẽ nói rõ hơn về vấn đề này trong bài học tiếp theo).
+     - BOOT_IMAGE - Đây là nơi chứa hình ảnh hạt nhân
+     - root - Vị trí của hệ thống tập tin gốc, hạt nhân tìm kiếm bên trong vị trí này để tìm init. Nó thường được biểu thị bằng UUID hoặc tên thiết bị như / dev / sda1.
+     - ro - Tham số này khá chuẩn, nó gắn hệ thống tập tin ở chế độ chỉ đọc.
+     - quite - Điều này được thêm vào để bạn không nhìn thấy các thông báo hiển thị đang diễn ra ở chế độ nền trong khi khởi động.
+     - splash - Điều này cho phép hiển thị màn hình giật gân.
+     
+ - Boot Process: Kernel
+   - Initrd vs Initramfs
+     - Kernel quản lý phần cứng hệ thống, tuy nhiên không phải tất cả các trình điều khiển đều có sẵn cho kernel trong quá trình khởi động. Vì vậy, phụ thuộc vào một hệ thống tệp gốc tạm thời chỉ chứa các mô-đun thiết yếu mà hạt nhân cần để truy cập vào phần còn lại của phần cứng. 
+     - Trong các phiên bản cũ hơn của Linux, công việc này được giao cho initrd (đĩa ram ban đầu). Kernel sẽ gắn initrd, lấy các trình điều khiển khởi động cần thiết, sau đó khi tải xong mọi thứ cần thiết, nó sẽ thay thế initrd bằng hệ thống tệp gốc thực sự. Ngày nay, chúng ta có một thứ gọi là initramfs, đây là một hệ thống tệp gốc tạm thời được tích hợp sẵn trong chính hạt nhân để tải tất cả các trình điều khiển cần thiết cho hệ thống tệp gốc thực, vì vậy không cần phải định vị tệp initrd nữa.
+   - Gắn hệ thống tệp gốc
+     - Bây giờ hạt nhân có tất cả các mô-đun nó cần để tạo thiết bị gốc và gắn kết phân vùng gốc. 
+     - Tuy nhiên, trước khi tiếp tục, phân vùng gốc thực sự được gắn ở chế độ chỉ đọc để fsck có thể chạy an toàn và kiểm tra tính toàn vẹn của hệ thống. Sau đó, nó kết nối lại hệ thống tệp gốc ở chế độ đọc-ghi. Sau đó, hạt nhân định vị chương trình init và thực thi nó.
+ 
+ - Boot Process: Init
+   - System V init (sysv)
+     - Đây là hệ thống init truyền thống. 
+     - Nó tuần tự bắt đầu và dừng các quy trình, dựa trên các tập lệnh khởi động. 
+     - Trạng thái của máy được biểu thị bằng các cấp chạy, mỗi cấp chạy khởi động hoặc dừng một máy theo một cách khác nhau. 
+   - Upstart
+     - Đây là init sẽ tìm thấy trên các bản cài đặt Ubuntu cũ hơn. 
+     - Upstart sử dụng ý tưởng về các công việc và sự kiện và hoạt động bằng cách bắt đầu các công việc thực hiện các hành động nhất định để phản ứng lại các sự kiện.  
+   - Systemd
+     - Đây là tiêu chuẩn mới cho init, nó hướng tới mục tiêu.
+     - Về cơ bản, có một mục tiêu mà muốn đạt được và systemd cố gắng đáp ứng các yếu tố phụ thuộc của mục tiêu để hoàn thành mục tiêu.
+ 
+## 12. Kernel 
+ - Overview of the Kernel
+   - Hạt nhân là cốt lõi của hệ điều hành. 
+   - Hệ điều hành Linux có thể được tổ chức thành ba cấp độ trừu tượng khác nhau:
+     - Cấp cơ bản nhất: phần cứng, bao gồm CPU, bộ nhớ, đĩa cứng, cổng mạng, v.v. Lớp vật lý thực sự tính toán những gì máy đang làm.
+     - Cấp độ tiếp theo là hạt nhân, xử lý quá trình và quản lý bộ nhớ, giao tiếp thiết bị, lệnh gọi hệ thống, thiết lập hệ thống tệp của chúng ta, v.v. Công việc của hạt nhân là nói chuyện với phần cứng để đảm bảo nó thực hiện những gì muốn các quá trình của làm. 
+     - Không gian người dùng bao gồm trình bao, chương trình, đồ họa, v.v.
+     
+ - Privilege Levels
+   - Trong chế độ kernel, kernel có toàn quyền truy cập vào phần cứng, nó kiểm soát mọi thứ. Trong chế độ không gian người dùng, có một lượng rất nhỏ bộ nhớ an toàn và CPU mà được phép truy cập.
+   - Các chế độ khác nhau này được gọi là các mức đặc quyền (được đặt tên phù hợp cho các mức đặc quyền mà nhận được) và thường được mô tả như các vòng bảo vệ.
+   
+ - System Calls
+   - Các cuộc gọi hệ thống (syscall) cung cấp cho các quy trình không gian người dùng một cách để yêu cầu hạt nhân làm một việc gì đó. 
+   - Kernel cung cấp một số dịch vụ nhất định thông qua API gọi hệ thống. Các dịch vụ này cho phép đọc hoặc ghi vào một tệp, sửa đổi mức sử dụng bộ nhớ, sửa đổi mạng, v.v. 
+   - Số lượng dịch vụ là cố định, vì vậy không thể thêm lệnh gọi hệ thống hoàn toàn, hệ thống đã có một bảng hệ thống cuộc gọi tồn tại và mỗi cuộc gọi hệ thống có một ID duy nhất.
+   - Có thể xem các lệnh gọi hệ thống mà tiến trình thực hiện bằng lệnh strace: ``` strace ls ```
+   
+ - Kernel Installation
+   - Để xem có phiên bản kernel nào trên hệ thống sử dụng lệnh ``` uname -r ```. lệnh uname in thông tin hệ thống, -r in ra tất cả các phiên bản phát hành.
+   - Có thể cài đặt nhân Linux theo nhiều cách khác nhau, có thể tải xuống gói nguồn và biên dịch từ nguồn hoặc có thể cài đặt nó bằng các công cụ quản lý gói: ``` sudo apt install linux-generic-lts-living ```
+   - Nâng cấp ``` sudo apt dist-upgrade ```
+   
+ - Kernel Location
+   - Khi cài đặt kernel mới nó sẽ thêm vài tệp vào hệ thống, những tệp này sẽ thường được thêm vào thư mục /boot, sẽ thấy nhiều tệp cho các phiên bản kernel khác nhau:
+     - vmlinuz - đây là hạt nhân linux thực tế
+     - initrd - như chúng ta đã thảo luận trước đây, initrd được sử dụng như một hệ thống tệp tạm thời, được sử dụng trước khi tải hạt nhân
+     - System.map - bảng tra cứu tượng trưng
+     - config - cài đặt cấu hình hạt nhân, nếu bạn đang biên dịch hạt nhân của riêng mình, bạn có thể đặt mô-đun nào có thể được tải
+   
+ - Kernel Modules
+   - Bản thân hạt nhân là một phần mềm nguyên khối, khi chúng ta muốn thêm hỗ trợ cho một loại bàn phím mới, chúng ta không viết mã này trực tiếp vào mã hạt nhân. Mô-đun nhân là các đoạn mã có thể được tải và dỡ xuống nhân theo yêu cầu. Chúng cho phép chúng ta mở rộng chức năng của hạt nhân mà không thực sự thêm vào mã nhân chính. Chúng tôi cũng có thể thêm các mô-đun và không phải khởi động lại hệ thống (trong hầu hết các trường hợp). 
+   - Xem danh sách các module đã tải ``` lsmod ```
+   - Tải module ``` sudo modprobe bluetooth ```
+   - Xóa ``` sudo modprobe -r bluetooth ```
+   - Tải khi khởi động: có thể tải các mô-đun trong khi khởi động hệ thống, thay vì tải tạm thời bằng modprobe (sẽ được tải khi bạn khởi động lại). Chỉ cần sửa đổi thư mục /etc/modprobe.d và thêm tệp cấu hình vào đó như sau: 
+      ``` /etc/modprobe.d/peanutbutter.conf 
+          options peanut_butter type=almond
+      ```
+   - Không tải khi khởi động: 
+      ``` /etc/modprobe.d/peanutbutter.conf 
+          blacklist peanut_butter
+      ``` 
+      
+## 13. Init
+ - System V Overview
+   - Mục đích chính của init là khởi động và dừng các tiến trình thiết yếu trên hệ thống. Có ba cách triển khai chính của init trong Linux, System V, Upstart và systemd.
+   - Nếu có tệp /etc/inittab thì rất có thể đang chạy Sys V.
+   - Sys V bắt đầu và dừng các quy trình một cách tuần tự.
+   - Ưu điểm của việc sử dụng triển khai init này là nó tương đối dễ dàng để giải quyết các phụ thuộc.
+   - Khi sử dụng Sys V, trạng thái của máy được xác định bởi các cấp chạy được đặt từ 0 đến 6. Các chế độ khác nhau này sẽ khác nhau tùy thuộc vào phân phối, nhưng hầu hết thời gian sẽ giống như sau:
+     - 0: tắt máy
+     - 1: chế độ một người dùng
+     - 2: chế độ đa người dùng không kết nối mạng
+     - 3: chế độ đa người dùng với mạng
+     - 4: không sử dụng
+     - 5: chế độ đa người dùng với mạng và GUI
+     - 6: khởi động lại
+   - Khi hệ thống của khởi động, nó sẽ xem đang ở cấp độ chạy nào và thực thi các tập lệnh nằm bên trong cấu hình cấp độ chạy đó. 
+   - Các tập lệnh nằm trong /etc/rc.d/rc[runlevel number] .d / hoặc /etc/init.d . Các tập lệnh bắt đầu bằng S (start) hoặc K (kill) sẽ chạy tương ứng khi khởi động và tắt máy. Các số bên cạnh các ký tự này là thứ tự mà chúng chạy trong đó. 
+     
+ - System V Service
+  - Liệt kê các dịch vụ ``` service --status-all ```
+  - Bắt đầu dịch vụ ``` sudo service networking start ```
+  - Dừng dịch vụ ``` sudo service networking stop ``` 
+  - Khởi động lại 1 dịch vụ ``` sudo service networking restart ``` 
+ 
+ - Upstart Overview
+   - Upstart được phát triển bởi Canonical, vì vậy nó đã được triển khai init trên Ubuntu trong một thời gian, tuy nhiên trên các bản cài đặt Ubuntu hiện đại, systemd hiện đã được sử dụng. 
+   - Upstart được tạo ra để cải thiện các vấn đề với Sys V, chẳng hạn như quy trình khởi động nghiêm ngặt, chặn các tác vụ, v.v. Mô hình hướng sự kiện và công việc của Upstart cho phép nó phản hồi các sự kiện khi chúng xảy ra.
+   - Để tìm hiểu xem có đang sử dụng Upstart hay không, nếu có thư mục /usr/share/upstart.
+   - Công việc là các hành động mà Upstart thực hiện và các sự kiện là thông báo nhận được từ các quy trình khác để kích hoạt công việc.
+   - Xem công việc và cấu hình ``` ls /etc/init ```
+   - Cách thức hoạt động của Upstart là:
+     - Đầu tiên, nó tải lên các cấu hình công việc từ /etc/init
+     - Khi một sự kiện khởi động xảy ra, nó sẽ chạy các công việc được kích hoạt bởi sự kiện đó.
+     - Những công việc này sẽ tạo ra những sự kiện mới và sau đó những sự kiện đó sẽ tạo ra nhiều công việc hơn
+     - Upstart tiếp tục thực hiện việc này cho đến khi hoàn thành tất cả các công việc cần thiết     
+ 
+ - Upstart Jobs
+   - Upstart có thể kích hoạt rất nhiều sự kiện và công việc để chạy, rất tiếc là không có cách nào dễ dàng để xem nơi bắt nguồn một sự kiện hoặc công việc, vì vậy sẽ phải xem xét các cấu hình công việc trong /etc/init. 
+   - Có rất nhiều lệnh hữu ích có thể sử dụng trong hệ thống Upstart:
+     - Xem công việc ``` initctl list ``` 
+     - Xem công việc cụ thể ``` initctl status networking ```
+     - Bắt đầu công việc theo cách thủ công ``` sudo initctl start networking ```
+     - Dừng công việc theo cách thủ công ``` sudo initctl stop networking ```
+     - Bắt đầu lại công việc theo cách thủ công ``` sudo initctl restart networking ```
+     - Phát ra một sự kiện theo cách thủ công ``` sudo initctl emit some_event ```   
+ - Systemd Overview
+   - Systemd đang dần trở thành tiêu chuẩn mới nổi cho init. Nếu có thư mục /usr/lib/systemd, rất có thể đang sử dụng systemd.
+   - Systemd sử dụng các mục tiêu để thiết lập và chạy hệ thống
+   - Systemd cực kỳ linh hoạt và mạnh mẽ, nó không tuân theo một trình tự nghiêm ngặt để bắt đầu các quy trình. Đây là những gì xảy ra trong quá trình khởi động systemd điển hình:
+     - Đầu tiên, systemd tải các tệp cấu hình của nó, thường nằm trong /etc/systemd/system hoặc /usr/lib/systemd/system
+     - Sau đó, nó xác định mục tiêu khởi động, thường là mặc định.
+     - Systemd tìm ra các phụ thuộc của mục tiêu khởi động và kích hoạt chúng
+   - Systemd khởi động vào các mục tiêu khác nhau:
+     - poweroff.target - hệ thống tắt máy
+     - Rescue.target - chế độ một người dùng
+     - multi-user.target - đa người dùng với mạng
+     - graphical.target - đa người dùng với mạng và GUI
+     - reboot.target - khởi động lại
+   - Đối tượng chính mà systemd làm việc được gọi là đơn vị. Systemd không chỉ dừng và khởi động các dịch vụ, nó có thể gắn kết các hệ thống tập tin, giám sát các ổ cắm mạng, v.v. và vì sự mạnh mẽ đó, nó có các loại đơn vị khác nhau mà nó hoạt động. Các đơn vị phổ biến nhất là: 
+     - Đơn vị dịch vụ - đây là những dịch vụ chúng tôi đã bắt đầu và dừng lại, các tệp đơn vị này kết thúc bằng .service
+     - Gắn kết các đơn vị - Các hệ thống tệp gắn kết này, các tệp đơn vị này kết thúc bằng .mount
+     - Các đơn vị mục tiêu - Các đơn vị này nhóm lại với nhau các đơn vị khác, các tệp kết thúc bằng .target       
+ 
+ - Systemd Goals
+   - Tệp dịch vụ cơ bản: foodar.service:
+     ```
+     [Unit] // cung cấp cho tệp đơn vị và kiểm soát thứ tự thời điểm kích hoạt thiết bị
+     Description=My Foobar
+     Before=bar.target
+     [Service] // Có thể bắt đầu hoặc dừng lại hoặc tải lại dịch vụ
+     ExecStart=/usr/bin/foobar
+     [Install] // được sử dụng để phụ thuộc
+     WantedBy=multi-user.target
+     -   
+     - Power States
+     ```
+   
+   - Một số lệnh sử dụng với các đơn vị systemd  
+     - Liệt kê các đơn vị ``` systemctl list-units ```
+     - Xem trạng thái của đơn vị ``` systemctl status networking.service ``` 
+     - Bắt đầu một dịch vụ ``` sudo systemctl start networking.service ``` 
+     - Dừng dịch vụ ``` sudo systemctl stop networking.service ```
+     - Khởi động lại một dịch vụ ``` sudo systemctl restart networking.service ```
+     - Bật một đơn vị ``` sudo systemctl enable networking.service ```  
+     - Vô hiệu hóa một đơn vị ``` sudo systemctl disable networking.service ```
+ 
+ - Power States
+   - Tắt hệ thống ``` sudo shutdown -h now ``` 
+   - Tắt hệ thống nhưng thêm thời gian chỉ định tính bằng phút ``` sudo shutdown -h +2 ``` 
+   - Khởi động lại bằng lệnh tắt máy ``` sudo shutdown -r now ``` 
+   - Khởi động lại ``` sudo reboot ``` 
+ 
+## 14. Process Utilization
+ - Tracking process: top
+ 
+ - Isof and fuser
+ 
+ - Process Threads
+ 
+ - CPU Monitoring
+ 
+ - I/O Monitoring
+ 
+ - Memory Monitoring
+ 
+ - Continuous Monitoring
+ 
+ - Cron Jobs
+     
+      
+
+   
+              
+
+      
+  
+
+  
+          
+
+   
+
+   
+
+      
+
+
+
+
+    
+  
+ 
     
   
 
