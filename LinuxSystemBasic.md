@@ -1247,20 +1247,157 @@ Linux System Basic
  
 ## 14. Process Utilization
  - Tracking process: top
- 
+   - top
+      ```
+      top - 18:06:26 up 6 days,  4:07,  2 users,  load average: 0.92, 0.62, 0.59
+      Tasks: 389 total,   1 running, 387 sleeping,   0 stopped,   1 zombie
+      %Cpu(s):  1.8 us,  0.4 sy,  0.0 ni, 97.6 id,  0.1 wa,  0.0 hi,  0.0 si,  0.0 st
+      KiB Mem:  32870888 total, 27467976 used,  5402912 free,   518808 buffers
+      KiB Swap: 33480700 total,    39892 used, 33440808 free. 19454152 cached Mem
+      PID USER      PR  NI    VIRT    RES    SHR S  %CPU %MEM     TIME+ COMMAND         6675 patty    20   0 1731472 520960  30876 S   8.3  1.6 160:24.79 chrome           6926 patty    20   0  935888 163456  25576 S   4.3  0.5   5:28.13 chrome 
+      ```
+   - Dòng 1: Đây là thông tin tương tự sẽ thấy nếu chạy lệnh thời gian hoạt động, các trường từ trái sang phải:
+     - Thời điểm hiện tại
+     - Hệ thống đã hoạt động trong bao lâu
+     - Có bao nhiêu người dùng hiện đang đăng nhập
+     - Mức trung bình tải của hệ thống 
+   - Dòng 2: Các tác vụ đang chạy, ngủ, dừng và chuyển động
+   - Dòng 3: Thông tin CPU
+     - us: thời gian sử dụng CPU của người dùng - Tỷ lệ phần trăm thời gian CPU dành cho việc chạy các quy trình của người dùng không liên quan.
+     - sy: thời gian CPU của hệ thống - Phần trăm thời gian CPU dành để chạy hạt nhân và các quá trình hạt nhân
+     - ni: thời gian CPU tốt - Tỷ lệ phần trăm thời gian CPU dành để chạy các quy trình bắt buộc
+     - id: Thời gian không hoạt động của CPU - Phần trăm thời gian CPU được sử dụng ở chế độ nhàn rỗi
+     - wa: I / O wait - Phần trăm thời gian CPU dành để chờ I / O. Nếu giá trị này thấp, vấn đề có thể không phải là ổ đĩa hoặc I / O mạng
+     - hi: phần cứng ngắt - Tỷ lệ phần trăm thời gian CPU dành để phục vụ các phần cứng bị gián đoạn
+     - si: phần mềm ngắt - Tỷ lệ phần trăm thời gian CPU dành để phục vụ phần mềm bị gián đoạn
+     - st: ăn cắp thời gian - Nếu bạn đang chạy máy ảo, đây là phần trăm thời gian CPU đã bị đánh cắp từ bạn cho các tác vụ khác
+   - Dòng 4 và 5: Sử dụng bộ nhớ và sử dụng hoán đổi
+   - Danh sách quy trình hiện đang được sử dụng
+     - PID: Id của quy trình
+     - USER: người dùng là chủ sở hữu của quá trình
+     - PR: Mức độ ưu tiên của quy trình
+     - NI: Giá trị tốt đẹp
+     - VIRT: Bộ nhớ ảo được sử dụng bởi quá trình 
+     - RES: Bộ nhớ vật lý được sử dụng từ quá trình
+     - SHR: Bộ nhớ được chia sẻ về quy trình
+     - S: Cho biết trạng thái của quá trình: S = ngủ, R = đang chạy, Z = xác sống, D = không gián đoạn, T = dừng
+     - % CPU - đây là phần trăm CPU được sử dụng bởi quá trình này
+     - % MEM - phần trăm RAM được sử dụng bởi quá trình này
+     - TIME + - tổng thời gian hoạt động của quá trình này
+     - COMMAND - tên của quá trình
+   - Có thể chỉ định một ID quy trình nếu chỉ muốn theo dõi các quy trình nhất định ``` top -p 1 ```        
+
  - Isof and fuser
+   - Isof: Tệp không chỉ là tệp văn bản, hình ảnh, v.v., chúng là tất cả mọi thứ trên hệ thống, đĩa, đường ống, ổ cắm mạng, thiết bị, v.v. Để xem những gì được sử dụng bởi một quy trình, có thể sử dụng lệnh lsof (viết tắt của "liệt kê các tệp đang mở") điều này sẽ hiển thị cho bạn danh sách tất cả các tệp đang mở và quy trình liên quan của chúng.
+   - fuser: Một cách khác để theo dõi một quá trình là lệnh fuser (viết tắt của "file user"), lệnh này sẽ hiển thị thông tin về quá trình đang sử dụng tệp hoặc người dùng tệp.    
  
  - Process Threads
+   - Các luồng rất giống với các quy trình, ở chỗ chúng được sử dụng để thực thi cùng một chương trình, chúng thường được gọi là các quy trình nhẹ. 
+   - Nếu một quy trình có một luồng thì nó là một luồng và nếu một quy trình có nhiều hơn một luồng thì nó là đa luồng. Tuy nhiên, tất cả các quy trình đều có ít nhất một luồng. 
+   - Các quy trình hoạt động với các tài nguyên hệ thống cô lập của riêng chúng, tuy nhiên các luồng có thể chia sẻ các tài nguyên này với nhau một cách dễ dàng, giúp chúng giao tiếp với nhau dễ dàng hơn và đôi khi sẽ hiệu quả hơn nếu có một ứng dụng đa luồng hơn là một ứng dụng đa quy trình.
+   - Để xem các chuỗi quy trình sử dụng lệnh ``` ps m ``` , các quy trình được ký hiệu với mỗi PID và bên dưới là các luồng của chúng (kí hiệu a-).
  
  - CPU Monitoring
+   - Lệnh ``` uptime ``` để xem mức trung bình tải
+   - Mức trung bình tải là cách tốt để xem tải CPU trên hệ thống. Những con số này thể hiện mức tải trung bình của CPU trong các khoảng thời gian 1, 5 và 15 phút. 
  
  - I/O Monitoring
- 
+   - Lệnh ``` iostat ``` dùng để theo dõi việc sử dụng CPU cũng như theo dõi việc sử dụng đĩa.
+     ```
+     iostat
+     Linux 3.13.0-39-lowlatency (icebox)     01/28/2016      _i686_  (1 CPU)
+     avg-cpu:  %user   %nice %system %iowait  %steal   %idle
+     0.13    0.03    0.50    0.01    0.00   99.33
+     Device:            tps    kB_read/s    kB_wrtn/s    kB_read    kB_wrtn
+     sda               0.17         3.49         1.92     385106     212417
+     ```
+   - Phần đầu là thông tin CPU:
+     - %user: Hiển thị phần trăm sử dụng CPU đã xảy ra khi thực thi ở cấp người dùng (ứng dụng)
+     - %nice: Hiển thị phần trăm sử dụng CPU đã xảy ra trong khi thực thi ở cấp độ người dùng với mức độ ưu tiên tốt. Việc sử dụng CPU của người dùng với mức độ ưu tiên tốt 
+     - %system: Hiển thị phần trăm sử dụng CPU đã xảy ra trong khi thực thi ở cấp hệ thống (nhân).
+     - %iowait: Hiển thị phần trăm thời gian CPU hoặc các CPU không hoạt động trong đó hệ thống có yêu cầu I / O đĩa chưa xử lý.  
+     - %steal: Hiển thị phần trăm thời gian chờ đợi không tự nguyện của CPU ảo hoặc các CPU trong khi trình siêu giám sát đang bảo dưỡng một bộ xử lý ảo khác.
+     - %idle: Hiển thị phần trăm thời gian CPU hoặc các CPU không hoạt động và hệ thống không có yêu cầu I / O đĩa chưa xử lý.
+   - Phần 2 là sử dụng đĩa:
+     - tps - Cho biết số lần truyền mỗi giây đã được cấp cho thiết bị. Chuyển là một yêu cầu I / O tới thiết bị. Nhiều yêu cầu logic có thể được kết hợp thành một yêu cầu I / O duy nhất tới thiết bị. Một chuyển nhượng có kích thước không xác định.
+     - kB_read / s - Cho biết lượng dữ liệu được đọc từ thiết bị được biểu thị bằng kilobyte mỗi giây.
+     - kB_wrtn / s - Cho biết lượng dữ liệu được ghi vào thiết bị được biểu thị bằng kilobyte mỗi giây.
+     - kB_read - Tổng số kilobyte được đọc.
+     - kB_wrtn - Tổng số kilobyte được viết.   
+  
  - Memory Monitoring
- 
+   - Lệnh ``` vmstat ``` dùng để theo dõi việc sử dụng bộ nhớ
+     ```
+     vmstat
+     procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----
+     r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st
+     1  0      0 396528  38816 384036    0    0     4     2   38   79  0  0 99  0  0
+     ```
+   - Có các trường:
+     - procs: 
+       - r: số quá trình cho thời gian chạy
+       - b: số lượng quá trình trong chế độ ngủ liên tục
+     - memory:
+       - swpd: Dung lượng bộ nhớ ảo được sử dụng
+       - free: Dung lượng bộ nhớ trống
+       - buff: Lượng bộ nhớ được sử dụng làm bộ đệm
+       - cache: Lượng bộ nhớ được sử dụng làm bộ nhớ đệm
+     - swap:
+       - si: Dung lượng bộ nhớ được hoán đổi trong đĩa
+       - so: Dung lượng bộ nhớ được hoán đổi ra đĩa
+     - io:
+       - bi: Số lượng khối nhận được từ một thiết bị khối
+       - bo: Số lượng khối được gửi đến một thiết bị khối
+     - system:
+       - in: Số lần ngắt mỗi giây
+       - cs: Số lần chuyển đổi ngữ cảnh mỗi giây
+     - cpu:
+       - us: Thời gian dành cho người dùng
+       - si: Thời gian dành cho thời gian hạt nhân
+       - id: Thời gian nhàn rỗi
+       - wa: Thời gian chờ IO
+      
  - Continuous Monitoring
+   - Sử dụng ``` sar ``` để giám sát liên tục, thu thập, báo cáo và lưu thông tin hoạt động hệ thống.
+   - Cài đặt sar: Sar là một công cụ được sử dụng để phân tích lịch sử trên hệ thống, cài nó bằng cách cài đặt gói sysstat sudo apt install sysstat.
+   - Thiết lập thu thập dữ liệu: Thông thường khi cài đặt sysstat, hệ thống sẽ tự động bắt đầu thu thập dữ liệu, nếu không, có thể kích hoạt nó bằng cách sửa đổi trường ENABLED trong /etc/default/sysstat.
+   - Sử dụng sar ``` sudo sar -q ```
+   - Liệt kê các chi tiết từ đầu ngày ``` sudo sar -r ```
+   - Liệt kê các chi tiết về việc sử dụng bộ nhớ từ đầu ngày ``` sudo sar -P ```
+   - Liệt kê các chi tiết về việc sử dụng CPU ``` sar -q /var/log/sysstat/sa02 ```
+   - Để xem chế độ xem của một ngày khác, có thể truy cập /var/log/sysstat/saXX trong đó XX là ngày bạn muốn xem.
  
  - Cron Jobs
+   - ``` Cron ``` dùng để lập lịch các tác vụ.
+   - Ví dụ: Có một tập lệnh nằm trong /home/pete/scripts/change_wallpaper. Sử dụng tập lệnh này mỗi sáng để thay đổi hình ảnh sử dụng cho hình nền, nhưng mỗi sáng phải thực thi tập lệnh này theo cách thủ công. Thay vào đó, những gì có thể làm là tạo một công việc cron thực thi tập lệnh thông qua cron. Có thể chỉ định thời gian muốn lệnh cron này chạy và thực thi tập lệnh.
+     ```
+     30 08 * * * /home/pete/scripts/change_wallpaper
+     ```
+   - Các trường từ trái sang phải
+     - Phút
+     - Giờ
+     - Ngày trong tháng
+     - Tháng
+     - Ngày trong tuần
+     - Dấu * có nghĩa là khớp với mọi giá trị, như trong ví dụ trên là hằng ngày vào 8h30 sáng.
+   - Tạo cronjob chỉ cần chỉnh sửa tệp crontab ``` crontab -e ```
+   
+## 15. Logging
+ - System Logging
+ 
+ - syslog
+ 
+ - General Logging
+ 
+ - Kernel Logging
+ 
+ - Authentication Logging
+ 
+ - Managing Log Files
+   
+
+
+
      
       
 
